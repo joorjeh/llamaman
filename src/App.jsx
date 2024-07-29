@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Box, TextField, Button } from '@mui/material';
 
-// TODO add feature to cancel stream of message
 function App() {
   const messagesEndRef = useRef(null);
   const [messages, setMessages] = useState([]);
@@ -52,7 +51,6 @@ function App() {
           const chunk = decoder.decode(value);
           const lines = chunk.split('\n');
           for (const line of lines) {
-            console.log(line);
             if (line.trim() !== '') {
               try {
                 const parsed = JSON.parse(intermediateValue + line);
@@ -99,7 +97,6 @@ function App() {
         overflow: 'hidden',
       }}>
         <Box
-          ref={messagesEndRef}
           sx={{
             flexGrow: 1,
             overflowY: 'auto',
@@ -123,6 +120,7 @@ function App() {
               </Box>
             ))
           }
+          <div ref={messagesEndRef} />
         </Box>
         <Box component="form" onSubmit={handleSendMessage} sx={{ display: 'flex', gap: '10px' }}>
           <TextField
