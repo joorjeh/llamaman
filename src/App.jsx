@@ -7,6 +7,20 @@ function App() {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
 
+  const generatePrompt = () => {
+    let prompt = default_tool_system_prompt;
+    messages.forEach((message) => {
+      if (message.sender == 'user') {
+        prompt += message.text;
+        prompt += "<|eot_id|><|start_header_id|>assistant<|end_header_id|>";
+      } else if (message.sender == 'ai') {
+        prompt += message.text;
+        prompt += "<|eot_id|><|start_header_id|>user<|end_header_id|>"
+      }
+    });
+    return prompt;
+  }
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -20,6 +34,7 @@ function App() {
     if (inputMessage.trim() !== '') {
       setMessages(prevMessages => [...prevMessages, { text: inputMessage, sender: 'user' }]);
       setInputMessage('');
+      const prompt = generatePrompt();
 
       try {
         const response = await fetch('http://localhost:11434/api/generate', {
@@ -29,7 +44,7 @@ function App() {
           },
           body: JSON.stringify({
             model: 'llama3.1',
-            prompt: inputMessage,
+            prompt: prompt,
             stream: true,
           }),
         });
