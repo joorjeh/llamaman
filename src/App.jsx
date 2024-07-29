@@ -20,7 +20,7 @@ function App() {
           body: JSON.stringify({
             model: 'llama3.1',
             prompt: inputMessage,
-            stream: false,
+            stream: true,
           }),
         });
 
@@ -28,11 +28,36 @@ function App() {
           throw new Error('Failed to fetch response from Ollama');
         }
 
-        const data = await response.json();
-        setMessages(prevMessages => [...prevMessages, { text: data.response, sender: 'ai' }]);
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let aiResponse = '';
+
+        setMessages(prevMessages => [...prevMessages, { text: '', sender: 'ai' }]);
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value);
+          const lines = chunk.split('\n');
+          for (const line of lines) {
+            if (line.trim() !== '') {
+              const parsed = JSON.parse(line);
+              aiResponse += parsed.response;
+              setMessages(prevMessages => {
+                const newMessages = [...prevMessages];
+                newMessages[newMessages.length - 1].text = aiResponse;
+                return newMessages;
+              });
+            }
+          }
+        }
       } catch (error) {
-        console.error('Error querying Ollama:', error);
-        setMessages(prevMessages => [...prevMessages, { text: 'Error: Unable to get response', sender: 'ai' }]);
+        if (!error.toString().includes('Unexpected EOF')) {
+          console.log('EOF');
+        } else {
+          console.error('Error querying Ollama:', error);
+        }
       }
     }
   };
