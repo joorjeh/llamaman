@@ -58,6 +58,7 @@ Here is an example,
 <function=example_function_name>{"example_name": "example_value"}</function>
 
 Reminder:
+- ONLY call functions that you have access to
 - Function calls MUST follow the specified format
 - Required parameters MUST be specified
 - ONLY call one function at a time
