@@ -42,6 +42,7 @@ function App() {
           const chunk = decoder.decode(value);
           const lines = chunk.split('\n');
           for (const line of lines) {
+            console.log(line);
             if (line.trim() !== '') {
               try {
                 const parsed = JSON.parse(intermediateValue + line);
@@ -95,7 +96,7 @@ function App() {
                 justifyContent: message.sender === 'ai' ? 'flex-end' : 'flex-start'
               }}
             >
-              <Box sx={{ maxWidth: '70%' }}>
+              <Box sx={{ maxWidth: '70%', whiteSpace: 'pre-wrap' }}>
                 {message.text}
               </Box>
             </Box>
