@@ -38,25 +38,39 @@ function App() {
   };
 
   return (
-    <Box>
-      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{
+      width: '100vw',
+      height: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+    }}>
+      <Box sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '10px',
+        width: '100%',
+        height: '100%',
+      }}>
         {
           messages.map((message, index) => (
-            <div key={index} className={`message ${message.sender}`} style={{ justifyContent: message.sender === 'ai' ? 'flex-end' : 'flex-start' }}>
+            <Box
+              key={index}
+              sx={{ justifyContent: message.sender === 'ai' ? 'flex-end' : 'flex-start' }}
+            >
               {message.text}
-            </div>
+            </Box>
           ))
         }
+        <form onSubmit={handleSendMessage}>
+          <input
+            type="text"
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
+            placeholder="Type a message..."
+          />
+          <button type="submit">Send</button>
+        </form>
       </Box>
-      <form onSubmit={handleSendMessage}>
-        <input
-          type="text"
-          value={inputMessage}
-          onChange={(e) => setInputMessage(e.target.value)}
-          placeholder="Type a message..."
-        />
-        <button type="submit">Send</button>
-      </form>
     </Box>
   );
 }
