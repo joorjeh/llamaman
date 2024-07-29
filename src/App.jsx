@@ -43,6 +43,8 @@ function App() {
       height: '100vh',
       display: 'flex',
       flexDirection: 'column',
+      padding: '10px',
+      boxSizing: 'border-box',
     }}>
       <Box sx={{
         display: 'flex',
@@ -50,14 +52,20 @@ function App() {
         gap: '10px',
         width: '100%',
         height: '100%',
+        justifyContent: 'flex-end',
       }}>
         {
           messages.map((message, index) => (
             <Box
               key={index}
-              sx={{ justifyContent: message.sender === 'ai' ? 'flex-end' : 'flex-start' }}
+              sx={{
+                display: 'flex',
+                justifyContent: message.sender === 'ai' ? 'flex-end' : 'flex-start'
+              }}
             >
-              {message.text}
+              <Box sx={{ maxWidth: '70%' }}>
+                {message.text}
+              </Box>
             </Box>
           ))
         }
