@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Box } from '@mui/material';
 
 function App() {
   const [messages, setMessages] = useState([]);
@@ -37,14 +38,16 @@ function App() {
   };
 
   return (
-    <div className="container">
-      <div className="chat-box">
-        {messages.map((message, index) => (
-          <div key={index} className={`message ${message.sender}`}>
-            {message.text}
-          </div>
-        ))}
-      </div>
+    <Box>
+      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+        {
+          messages.map((message, index) => (
+            <div key={index} className={`message ${message.sender}`} style={{ justifyContent: message.sender === 'ai' ? 'flex-end' : 'flex-start' }}>
+              {message.text}
+            </div>
+          ))
+        }
+      </Box>
       <form onSubmit={handleSendMessage}>
         <input
           type="text"
@@ -54,7 +57,7 @@ function App() {
         />
         <button type="submit">Send</button>
       </form>
-    </div>
+    </Box>
   );
 }
 
