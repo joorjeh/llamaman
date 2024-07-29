@@ -8,20 +8,6 @@ function App() {
   const [inputMessage, setInputMessage] = useState('');
   const [prompt, setPrompt] = useState(default_tool_system_prompt);
 
-  const generatePrompt = (text, user) => {
-    let prompt = default_tool_system_prompt;
-    messages.forEach((message) => {
-      if (message.sender == 'user') {
-        prompt += message.text;
-        prompt += "<|eot_id|><|start_header_id|>assistant<|end_header_id|>";
-      } else if (message.sender == 'ai') {
-        prompt += message.text;
-        prompt += "<|eot_id|><|start_header_id|>user<|end_header_id|>"
-      }
-    });
-    return prompt;
-  }
-
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -33,9 +19,12 @@ function App() {
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (inputMessage.trim() !== '') {
+      let updatedPrompt = prompt;
+      updatedPrompt += inputMessage;
+      updatedPrompt += "<|eot_id|><|start_header_id|>assistant<|end_header_id|>";
+      setPrompt(updatedPrompt); // in case the response throws error
       setMessages(prevMessages => [...prevMessages, { text: inputMessage, sender: 'user' }]);
       setInputMessage('');
-      // TODO build prompt with message values and new input message
 
       try {
         const response = await fetch('http://localhost:11434/api/generate', {
@@ -45,7 +34,7 @@ function App() {
           },
           body: JSON.stringify({
             model: 'llama3.1',
-            prompt: prompt,
+            prompt: updatedPrompt,
             stream: true,
           }),
         });
@@ -84,6 +73,10 @@ function App() {
             }
           }
         }
+
+        updatedPrompt += aiResponse;
+        updatedPrompt += "<|eot_id|><|start_header_id|>user<|end_header_id|>";
+        setPrompt(updatedPrompt);
       } catch (error) {
         if (!error.toString().includes('Unexpected EOF')) {
           console.log('EOF');
