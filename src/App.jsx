@@ -1,10 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Box, TextField, Button } from '@mui/material';
 
 // TODO add feature to cancel stream of message
 function App() {
+  const messagesEndRef = useRef(null);
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -89,13 +98,15 @@ function App() {
         boxSizing: 'border-box',
         overflow: 'hidden',
       }}>
-        <Box sx={{
-          flexGrow: 1,
-          overflowY: 'auto',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '10px',
-        }}>
+        <Box
+          ref={messagesEndRef}
+          sx={{
+            flexGrow: 1,
+            overflowY: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '10px',
+          }}>
           {
             messages.map((message, index) => (
               <Box
