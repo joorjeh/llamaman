@@ -6,8 +6,9 @@ function App() {
   const messagesEndRef = useRef(null);
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
+  const [prompt, setPrompt] = useState(default_tool_system_prompt);
 
-  const generatePrompt = () => {
+  const generatePrompt = (text, user) => {
     let prompt = default_tool_system_prompt;
     messages.forEach((message) => {
       if (message.sender == 'user') {
@@ -34,7 +35,7 @@ function App() {
     if (inputMessage.trim() !== '') {
       setMessages(prevMessages => [...prevMessages, { text: inputMessage, sender: 'user' }]);
       setInputMessage('');
-      const prompt = generatePrompt();
+      // TODO build prompt with message values and new input message
 
       try {
         const response = await fetch('http://localhost:11434/api/generate', {
