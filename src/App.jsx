@@ -113,7 +113,8 @@ function App() {
                 key={index}
                 sx={{
                   display: 'flex',
-                  justifyContent: message.sender === 'ai' ? 'flex-end' : 'flex-start'
+                  justifyContent: message.sender === 'ai' ? 'flex-end' : 'flex-start',
+                  marginTop: index === 0 ? 'auto' : 'initial'
                 }}
               >
                 <Box sx={{ maxWidth: '70%', whiteSpace: 'pre-wrap' }}>
