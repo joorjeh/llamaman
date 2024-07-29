@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box } from '@mui/material';
+import { Box, TextField, Button } from '@mui/material';
 
 function App() {
   const [messages, setMessages] = useState([]);
@@ -43,13 +43,11 @@ function App() {
       height: '100vh',
       display: 'flex',
       flexDirection: 'column',
-      padding: '10px',
-      boxSizing: 'border-box',
+      position: 'fixed',
     }}>
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',
-        gap: '10px',
         width: '100%',
         height: '100%',
         justifyContent: 'flex-end',
@@ -69,15 +67,16 @@ function App() {
             </Box>
           ))
         }
-        <form onSubmit={handleSendMessage}>
-          <input
-            type="text"
+        <Box component="form" onSubmit={handleSendMessage} sx={{ display: 'flex', gap: '10px' }}>
+          <TextField
+            fullWidth
+            variant="outlined"
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             placeholder="Type a message..."
           />
-          <button type="submit">Send</button>
-        </form>
+          <Button type="submit" variant="contained">Send</Button>
+        </Box>
       </Box>
     </Box>
   );
