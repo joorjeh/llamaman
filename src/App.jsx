@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Box, TextField, Button } from '@mui/material';
 
+// TODO add feature to cancel stream of message
 function App() {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
