@@ -48,9 +48,12 @@ function App() {
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',
+        gap: '10px',
         width: '100%',
         height: '100%',
         justifyContent: 'flex-end',
+        padding: '10px',
+        boxSizing: 'border-box',
       }}>
         {
           messages.map((message, index) => (
