@@ -42,7 +42,6 @@ function App() {
           const chunk = decoder.decode(value);
           const lines = chunk.split('\n');
           for (const line of lines) {
-            console.log(line);
             if (line.trim() !== '') {
               try {
                 const parsed = JSON.parse(intermediateValue + line);
