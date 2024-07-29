@@ -16,6 +16,12 @@ function App() {
     scrollToBottom();
   }, [messages]);
 
+  const clearChat = (e) => {
+    e.preventDefault();
+    setMessages([]);
+    setPrompt(default_tool_system_prompt);
+  }
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (inputMessage.trim() !== '') {
@@ -141,6 +147,7 @@ function App() {
             placeholder="Type a message..."
           />
           <Button type="submit" variant="contained">Send</Button>
+          <Button variant="contained" onClick={clearChat}>Clear</Button>
         </Box>
       </Box>
     </Box>
