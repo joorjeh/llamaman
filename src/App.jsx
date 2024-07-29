@@ -87,22 +87,31 @@ function App() {
         justifyContent: 'flex-end',
         padding: '10px',
         boxSizing: 'border-box',
+        overflow: 'hidden',
       }}>
-        {
-          messages.map((message, index) => (
-            <Box
-              key={index}
-              sx={{
-                display: 'flex',
-                justifyContent: message.sender === 'ai' ? 'flex-end' : 'flex-start'
-              }}
-            >
-              <Box sx={{ maxWidth: '70%', whiteSpace: 'pre-wrap' }}>
-                {message.text}
+        <Box sx={{
+          flexGrow: 1,
+          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '10px',
+        }}>
+          {
+            messages.map((message, index) => (
+              <Box
+                key={index}
+                sx={{
+                  display: 'flex',
+                  justifyContent: message.sender === 'ai' ? 'flex-end' : 'flex-start'
+                }}
+              >
+                <Box sx={{ maxWidth: '70%', whiteSpace: 'pre-wrap' }}>
+                  {message.text}
+                </Box>
               </Box>
-            </Box>
-          ))
-        }
+            ))
+          }
+        </Box>
         <Box component="form" onSubmit={handleSendMessage} sx={{ display: 'flex', gap: '10px' }}>
           <TextField
             fullWidth
