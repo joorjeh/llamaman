@@ -34,6 +34,7 @@ function App() {
 
         setMessages(prevMessages => [...prevMessages, { text: '', sender: 'ai' }]);
 
+        let intermediateValue = '';
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
@@ -41,14 +42,20 @@ function App() {
           const chunk = decoder.decode(value);
           const lines = chunk.split('\n');
           for (const line of lines) {
+            console.log(line);
             if (line.trim() !== '') {
-              const parsed = JSON.parse(line);
-              aiResponse += parsed.response;
-              setMessages(prevMessages => {
-                const newMessages = [...prevMessages];
-                newMessages[newMessages.length - 1].text = aiResponse;
-                return newMessages;
-              });
+              try {
+                const parsed = JSON.parse(intermediateValue + line);
+                aiResponse += parsed.response;
+                setMessages(prevMessages => {
+                  const newMessages = [...prevMessages];
+                  newMessages[newMessages.length - 1].text = aiResponse;
+                  return newMessages;
+                });
+                intermediateValue = '';
+              } catch (error) {
+                intermediateValue += line;
+              }
             }
           }
         }
