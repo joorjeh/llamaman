@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Box, TextField, Button } from '@mui/material';
+import { default_tool_system_prompt } from './prompts/default_tool_system_prompt';
 
 function App() {
   const messagesEndRef = useRef(null);
