@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Box, TextField, Button, CircularProgress, Modal, Typography } from '@mui/material';
-import { Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { Box, TextField, Button, CircularProgress, Modal, Typography, Select, FormControl, MenuItem } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { default_tool_system_prompt } from './prompts/default_tool_system_prompt';
 import { getAWSStreamingResponse, getOllamaStreamingResponse } from './platforms';
@@ -13,7 +12,7 @@ interface Message {
 
 interface UserConfig {
   platform: string;
-  url: String;
+  url: string;
 }
 
 // Get the user config
@@ -32,32 +31,35 @@ function App() {
   const messagesEndRef = useRef<any>(null); // TODO determine correct type
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState<string>('');
+  const [platform, setPlatform] = useState<string | null>(null);
+  const [url, setUrl] = useState<string | null>(null);
   const [prompt, setPrompt] = useState<string>(default_tool_system_prompt);
-  const [config, setConfig] = useState<UserConfig | null>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   const handleConfigUpdate = async (e: any) => {
-    console.log(e.target.value);
-    // if (config) {
-    //   const newConfig = { ...config, platform: newPlatform };
-    //   await updateUserConfig(newConfig);
-    //   setConfig(newConfig);
-    // }
+    const newConfig = {
+      platform: platform!,
+      url: url!,
+    }
+    await updateUserConfig(newConfig);
   };
 
   // Load config on app load
   useEffect(() => {
-    getUserConfig().then(setConfig);
+    getUserConfig().then((config) => {
+      setPlatform(config.platform);
+      setUrl(config.url);
+    });
   }, []);
 
   useEffect(() => {
-    if (config) {
+    if (platform) {
       setLoading(false);
     }
-  }, [config]);
+  }, [platform, url]);
 
   useEffect(() => {
     scrollToBottom();
@@ -82,9 +84,9 @@ function App() {
       try {
         setMessages(prevMessages => [...prevMessages, { text: '', sender: 'ai' }]);
 
-        if (config) {
+        if (platform) {
           let aiResponse: string = "";
-          for await (const chunk of config.platform === 'aws' ? getAWSStreamingResponse({
+          for await (const chunk of platform === 'aws' ? getAWSStreamingResponse({
             prompt: updatedPrompt,
           }) : getOllamaStreamingResponse({
             prompt: updatedPrompt,
@@ -215,40 +217,24 @@ function App() {
             >
               Config
             </Typography>
-            <FormControl fullWidth margin="normal">
-              <InputLabel>Platform</InputLabel>
+            <FormControl>
               <Select
-                labelId="platform-label"
+                value={platform}
                 label="Platform"
-                variant="outlined"
-                value={selectedPlatform}
-                onChange={(event) => setSelectedPlatform(event.target.value)}
+                onChange={(e) => setPlatform(e.target.value)}
               >
-                <MenuItem value="">Select a platform</MenuItem>
                 <MenuItem value="aws">AWS</MenuItem>
                 <MenuItem value="ollama">Ollama</MenuItem>
               </Select>
               <TextField
-                label="Model"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-              />
-              <TextField
                 label="URL"
+                name="url"
                 variant="outlined"
-                fullWidth
-                margin="normal"
-                value={config?.url}
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
               />
-              <Button
-                variant="contained"
-                color="primary"
-                fullWidth
-                onSubmit={handleConfigUpdate}
-                sx={{ mt: 2 }}
-              >
-                Get Values
+              <Button onClick={handleConfigUpdate}>
+                Save
               </Button>
             </FormControl>
           </Box>
