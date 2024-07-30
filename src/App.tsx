@@ -40,6 +40,7 @@ function App() {
   };
 
   const handleConfigUpdate = async (e: any) => {
+    e.preventDefault();
     const newConfig = {
       platform: platform!,
       url: url!,

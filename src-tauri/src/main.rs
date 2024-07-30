@@ -5,7 +5,6 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 use tauri::{command, State};
 use dirs;
-use tauri::{Menu, MenuItem, CustomMenuItem, Submenu};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 struct UserConfig {
