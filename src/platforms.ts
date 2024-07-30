@@ -44,7 +44,7 @@ export async function* getOllamaStreamingResponse({
       const { done, value } = await reader.read();
       if (done) break;
 
-      const chunk = decoder.decode(value); m
+      const chunk = decoder.decode(value);
       if (chunk.trim() !== '') {
         try {
           const parsed = JSON.parse(intermediateValue + chunk);

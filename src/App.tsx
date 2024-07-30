@@ -11,6 +11,7 @@ interface Message {
 
 interface UserConfig {
   platform: string;
+  url: String;
 }
 
 // Get the user config
@@ -30,6 +31,7 @@ function App() {
   const [prompt, setPrompt] = useState<string>(default_tool_system_prompt);
   const [config, setConfig] = useState<UserConfig>({
     platform: 'ollama',
+    url: 'http://localhost:11434/api/generate',
   });
 
   const scrollToBottom = () => {
