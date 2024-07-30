@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Box, TextField, Button, CircularProgress } from '@mui/material';
+import { Box, TextField, Button, CircularProgress, Modal, Typography } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { default_tool_system_prompt } from './prompts/default_tool_system_prompt';
 import { getAWSStreamingResponse, getOllamaStreamingResponse } from './platforms';
@@ -27,6 +27,7 @@ async function updateUserConfig(newConfig: UserConfig): Promise<void> {
 
 function App() {
   const [isLoading, setLoading] = useState<boolean>(true);
+  const [openModal, setOpenModal] = useState<boolean>(false);
   const messagesEndRef = useRef<any>(null); // TODO determine correct type
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState<string>('');
@@ -169,11 +170,45 @@ function App() {
             />
             <Button type="submit" variant="contained" sx={{ height: '56px' }}>Send</Button>
             <Button variant="contained" onClick={clearChat} sx={{ height: '56px' }}>Clear</Button>
-            <SettingsIcon sx={{ height: '40px', width: '40px' }} />
+            <Button>
+              <SettingsIcon
+                sx={{
+                  height: '40px',
+                  width: '40px'
+                }}
+                onClick={() => setOpenModal(true)}
+              />
+            </Button>
           </Box>
         </Box>
       </Box >
-    }</>
+    }
+      <Modal
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: 400,
+          bgcolor: 'background.paper',
+          border: '2px solid #000',
+          boxShadow: 24,
+          p: 4,
+        }}>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Config
+          </Typography>
+          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+            Your settings content goes here.
+          </Typography>
+        </Box>
+      </Modal>
+    </>
   );
 }
 
