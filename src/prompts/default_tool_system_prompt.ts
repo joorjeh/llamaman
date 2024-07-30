@@ -1,4 +1,4 @@
-export const default_tool_system_prompt = `
+export const default_tool_system_prompt: string = `
 <|begin_of_text|><|start_header_id|>system<|end_header_id|>
 
 Cutting Knowledge Date: December 2023
