@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Box, TextField, Button } from '@mui/material';
+import { Box, TextField, Button, CircularProgress } from '@mui/material';
 import { default_tool_system_prompt } from './prompts/default_tool_system_prompt';
 import { getAWSStreamingResponse, getOllamaStreamingResponse } from './platforms';
 import { invoke } from '@tauri-apps/api/tauri';
@@ -25,14 +25,12 @@ async function updateUserConfig(newConfig: UserConfig): Promise<void> {
 }
 
 function App() {
+  const [isLoading, setLoading] = useState<boolean>(true);
   const messagesEndRef = useRef<any>(null); // TODO determine correct type
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState<string>('');
   const [prompt, setPrompt] = useState<string>(default_tool_system_prompt);
-  const [config, setConfig] = useState<UserConfig>({
-    platform: 'ollama',
-    url: 'http://localhost:11434/api/generate',
-  });
+  const [config, setConfig] = useState<UserConfig | null>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -50,6 +48,12 @@ function App() {
   useEffect(() => {
     getUserConfig().then(setConfig);
   }, []);
+
+  useEffect(() => {
+    if (config) {
+      setLoading(false);
+    }
+  }, [config]);
 
   useEffect(() => {
     scrollToBottom();
@@ -74,23 +78,25 @@ function App() {
       try {
         setMessages(prevMessages => [...prevMessages, { text: '', sender: 'ai' }]);
 
-        let aiResponse: string = "";
-        for await (const chunk of config.platform === 'aws' ? getAWSStreamingResponse({
-          prompt: updatedPrompt,
-        }) : getOllamaStreamingResponse({
-          prompt: updatedPrompt,
-        })) {
-          aiResponse += chunk;
-          setMessages(prevMessages => {
-            const newMessages = [...prevMessages];
-            newMessages[newMessages.length - 1].text = aiResponse;
-            return newMessages;
-          });
-        }
+        if (config) {
+          let aiResponse: string = "";
+          for await (const chunk of config.platform === 'aws' ? getAWSStreamingResponse({
+            prompt: updatedPrompt,
+          }) : getOllamaStreamingResponse({
+            prompt: updatedPrompt,
+          })) {
+            aiResponse += chunk;
+            setMessages(prevMessages => {
+              const newMessages = [...prevMessages];
+              newMessages[newMessages.length - 1].text = aiResponse;
+              return newMessages;
+            });
+          }
 
-        updatedPrompt += aiResponse;
-        updatedPrompt += "<|eot_id|><|start_header_id|>user<|end_header_id|>";
-        setPrompt(updatedPrompt);
+          updatedPrompt += aiResponse;
+          updatedPrompt += "<|eot_id|><|start_header_id|>user<|end_header_id|>";
+          setPrompt(updatedPrompt);
+        }
       } catch (error: any) {
         console.error("Error: ", error.toString())
       }
@@ -99,63 +105,65 @@ function App() {
   }
 
   return (
-    <Box sx={{
-      width: '100vw',
-      height: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      position: 'fixed',
-    }}>
+    <> {isLoading ? <CircularProgress size={100} /> :
       <Box sx={{
+        width: '100vw',
+        height: '100vh',
         display: 'flex',
         flexDirection: 'column',
-        gap: '10px',
-        width: '100%',
-        height: '100%',
-        justifyContent: 'flex-end',
-        padding: '10px',
-        boxSizing: 'border-box',
-        overflow: 'hidden',
+        position: 'fixed',
       }}>
-        <Box
-          sx={{
-            flexGrow: 1,
-            overflowY: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '10px',
-          }}>
-          {
-            messages.map((message, index) => (
-              <Box
-                key={index}
-                sx={{
-                  display: 'flex',
-                  justifyContent: message.sender === 'ai' ? 'flex-end' : 'flex-start',
-                  marginTop: index === 0 ? 'auto' : 'initial'
-                }}
-              >
-                <Box sx={{ maxWidth: '70%', whiteSpace: 'pre-wrap' }}>
-                  {message.text}
+        <Box sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '10px',
+          width: '100%',
+          height: '100%',
+          justifyContent: 'flex-end',
+          padding: '10px',
+          boxSizing: 'border-box',
+          overflow: 'hidden',
+        }}>
+          <Box
+            sx={{
+              flexGrow: 1,
+              overflowY: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px',
+            }}>
+            {
+              messages.map((message, index) => (
+                <Box
+                  key={index}
+                  sx={{
+                    display: 'flex',
+                    justifyContent: message.sender === 'ai' ? 'flex-end' : 'flex-start',
+                    marginTop: index === 0 ? 'auto' : 'initial'
+                  }}
+                >
+                  <Box sx={{ maxWidth: '70%', whiteSpace: 'pre-wrap' }}>
+                    {message.text}
+                  </Box>
                 </Box>
-              </Box>
-            ))
-          }
-          <div ref={messagesEndRef} />
-        </Box>
-        <Box component="form" onSubmit={handleSendMessage} sx={{ display: 'flex', gap: '10px' }}>
-          <TextField
-            fullWidth
-            variant="outlined"
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            placeholder="Type a message..."
-          />
-          <Button type="submit" variant="contained">Send</Button>
-          <Button variant="contained" onClick={clearChat}>Clear</Button>
+              ))
+            }
+            <div ref={messagesEndRef} />
+          </Box>
+          <Box component="form" onSubmit={handleSendMessage} sx={{ display: 'flex', gap: '10px' }}>
+            <TextField
+              fullWidth
+              variant="outlined"
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              placeholder="Type a message..."
+            />
+            <Button type="submit" variant="contained">Send</Button>
+            <Button variant="contained" onClick={clearChat}>Clear</Button>
+          </Box>
         </Box>
       </Box>
-    </Box>
+    }</>
   );
 }
 
