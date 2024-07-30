@@ -2,10 +2,25 @@ import { useState, useEffect, useRef } from 'react';
 import { Box, TextField, Button } from '@mui/material';
 import { default_tool_system_prompt } from './prompts/default_tool_system_prompt';
 import { getAWSStreamingResponse, getOllamaStreamingResponse } from './platforms';
+import { invoke } from '@tauri-apps/api/tauri';
 
 interface Message {
   text: string;
   sender: string;
+}
+
+interface UserConfig {
+  platform: string;
+}
+
+// Get the user config
+async function getUserConfig(): Promise<UserConfig> {
+  return await invoke('get_user_config');
+}
+
+// Update the user config
+async function updateUserConfig(newConfig: UserConfig): Promise<void> {
+  await invoke('update_user_config', { newConfig });
 }
 
 function App() {
@@ -13,11 +28,27 @@ function App() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState<string>('');
   const [prompt, setPrompt] = useState<string>(default_tool_system_prompt);
-  const platform: string = "aws";
+  //const [streamingFunction, setStreamingFunction] = useState <
+  const [config, setConfig] = useState<UserConfig>({
+    platform: 'aws',
+  });
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  const handlePlatformChange = async (newPlatform: string) => {
+    if (config) {
+      const newConfig = { ...config, platform: newPlatform };
+      await updateUserConfig(newConfig);
+      setConfig(newConfig);
+    }
+  };
+
+  // Load config on app load
+  useEffect(() => {
+    getUserConfig().then(setConfig);
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
@@ -43,7 +74,7 @@ function App() {
         setMessages(prevMessages => [...prevMessages, { text: '', sender: 'ai' }]);
 
         let aiResponse: string = "";
-        for await (const chunk of platform === 'aws' ? getAWSStreamingResponse({
+        for await (const chunk of config.platform === 'aws' ? getAWSStreamingResponse({
           prompt: updatedPrompt,
         }) : getOllamaStreamingResponse({
           prompt: updatedPrompt,
