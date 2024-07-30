@@ -2,14 +2,7 @@ import {
   BedrockRuntimeClient,
   InvokeModelWithResponseStreamCommand
 } from '@aws-sdk/client-bedrock-runtime';
-
-interface StreamingArgs {
-  prompt: string;
-  model?: string;
-  url?: string;
-  temperature?: number;
-  top_p?: number;
-}
+import StreamingArgs from './types/StreamingArgs.ts';
 
 const client = new BedrockRuntimeClient({
   region: 'us-west-2',
