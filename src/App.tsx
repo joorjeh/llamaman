@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Box, TextField, Button, CircularProgress } from '@mui/material';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { default_tool_system_prompt } from './prompts/default_tool_system_prompt';
 import { getAWSStreamingResponse, getOllamaStreamingResponse } from './platforms';
 import { invoke } from '@tauri-apps/api/tauri';
@@ -100,7 +101,6 @@ function App() {
       } catch (error: any) {
         console.error("Error: ", error.toString())
       }
-
     }
   }
 
@@ -150,19 +150,29 @@ function App() {
             }
             <div ref={messagesEndRef} />
           </Box>
-          <Box component="form" onSubmit={handleSendMessage} sx={{ display: 'flex', gap: '10px' }}>
+          <Box
+            component="form"
+            onSubmit={handleSendMessage}
+            sx={{
+              display: 'flex',
+              gap: '10px',
+              alignItems: 'center'
+            }}
+          >
             <TextField
               fullWidth
               variant="outlined"
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               placeholder="Type a message..."
+              sx={{ height: '100%' }}
             />
-            <Button type="submit" variant="contained">Send</Button>
-            <Button variant="contained" onClick={clearChat}>Clear</Button>
+            <Button type="submit" variant="contained" sx={{ height: '56px' }}>Send</Button>
+            <Button variant="contained" onClick={clearChat} sx={{ height: '56px' }}>Clear</Button>
+            <SettingsIcon sx={{ height: '40px', width: '40px' }} />
           </Box>
         </Box>
-      </Box>
+      </Box >
     }</>
   );
 }
