@@ -9,6 +9,7 @@ use dirs;
 #[derive(Debug, Serialize, Deserialize, Clone)]
 struct UserConfig {
     platform: String,
+    url: String,
 }
 
 impl Default for UserConfig {
