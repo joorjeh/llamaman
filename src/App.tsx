@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Box, TextField, Button } from '@mui/material';
 import { default_tool_system_prompt } from './prompts/default_tool_system_prompt';
+import { getOllamaStreamingResponse } from './platforms';
 
 interface Message {
   text: string;
@@ -38,70 +39,29 @@ function App() {
       setInputMessage('');
 
       try {
-        const response = await fetch('http://localhost:11434/api/generate', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: 'llama3.1',
-            prompt: updatedPrompt,
-            stream: true,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch response from Ollama');
-        }
-
-        let reader: ReadableStreamDefaultReader<Uint8Array>;
-        if (response.body) {
-          reader = response.body.getReader();
-        } else {
-          return; 
-        }
-        const decoder = new TextDecoder();
-        let aiResponse = '';
-
         setMessages(prevMessages => [...prevMessages, { text: '', sender: 'ai' }]);
 
-        let intermediateValue = '';
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const chunk = decoder.decode(value);
-          const lines = chunk.split('\n');
-          for (const line of lines) {
-            if (line.trim() !== '') {
-              try {
-                const parsed = JSON.parse(intermediateValue + line);
-                aiResponse += parsed.response;
-                setMessages(prevMessages => {
-                  const newMessages = [...prevMessages];
-                  newMessages[newMessages.length - 1].text = aiResponse;
-                  return newMessages;
-                });
-                intermediateValue = '';
-              } catch (error) {
-                intermediateValue += line;
-              }
-            }
-          }
+        let aiResponse: string = "";
+        for await (const chunk of getOllamaStreamingResponse({
+          prompt: updatedPrompt,
+        })) {
+          aiResponse += chunk;
+          setMessages(prevMessages => {
+            const newMessages = [...prevMessages];
+            newMessages[newMessages.length - 1].text = aiResponse;
+            return newMessages;
+          });
         }
 
         updatedPrompt += aiResponse;
         updatedPrompt += "<|eot_id|><|start_header_id|>user<|end_header_id|>";
         setPrompt(updatedPrompt);
       } catch (error: any) {
-        if (!error.toString().includes('Unexpected EOF')) {
-          console.log('EOF');
-        } else {
-          console.error('Error querying endpoint', error);
-        }
+        console.error("Error: ", error.toString())
       }
+
     }
-  };
+  }
 
   return (
     <Box sx={{
