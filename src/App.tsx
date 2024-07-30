@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Box, TextField, Button } from '@mui/material';
 import { default_tool_system_prompt } from './prompts/default_tool_system_prompt';
-import { getOllamaStreamingResponse } from './platforms';
+import { getAWSStreamingResponse, getOllamaStreamingResponse } from './platforms';
 
 interface Message {
   text: string;
@@ -13,6 +13,7 @@ function App() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState<string>('');
   const [prompt, setPrompt] = useState<string>(default_tool_system_prompt);
+  const platform: string = "aws";
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -42,7 +43,9 @@ function App() {
         setMessages(prevMessages => [...prevMessages, { text: '', sender: 'ai' }]);
 
         let aiResponse: string = "";
-        for await (const chunk of getOllamaStreamingResponse({
+        for await (const chunk of platform === 'aws' ? getAWSStreamingResponse({
+          prompt: updatedPrompt,
+        }) : getOllamaStreamingResponse({
           prompt: updatedPrompt,
         })) {
           aiResponse += chunk;

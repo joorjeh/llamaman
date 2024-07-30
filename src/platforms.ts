@@ -1,3 +1,16 @@
+import {
+  BedrockRuntimeClient,
+  InvokeModelWithResponseStreamCommand
+} from '@aws-sdk/client-bedrock-runtime';
+
+const client = new BedrockRuntimeClient({
+  region: 'us-west-2',
+  credentials: {
+    accessKeyId: import.meta.env.VITE_ACCESS_KEY_ID,
+    secretAccessKey: import.meta.env.VITE_SECRET_ACCESS_KEY,
+  },
+});
+
 export async function* getOllamaStreamingResponse({
   prompt,
   model = 'llama3.1',
@@ -29,7 +42,7 @@ export async function* getOllamaStreamingResponse({
       const { done, value } = await reader.read();
       if (done) break;
 
-      const chunk = decoder.decode(value);
+      const chunk = decoder.decode(value); m
       if (chunk.trim() !== '') {
         try {
           const parsed = JSON.parse(intermediateValue + chunk);
@@ -45,3 +58,43 @@ export async function* getOllamaStreamingResponse({
   }
 };
 
+export async function* getAWSStreamingResponse({
+  prompt,
+  max_gen_len,
+  model = 'meta.llama3-1-70b-instruct-v1:0',
+  temperature = 0.0,
+  top_p = 0.9,
+}: {
+  prompt: string;
+  max_gen_len?: number;
+  model?: string;
+  temperature?: number;
+  top_p?: number;
+}): AsyncGenerator<string> {
+  const responseStream = await client.send(
+    new InvokeModelWithResponseStreamCommand({
+      contentType: "application/json",
+      modelId: model,
+      body: JSON.stringify({
+        prompt,
+        max_gen_len,
+        temperature,
+        top_p,
+      }),
+    }),
+  );
+
+  if (responseStream.body) {
+    for await (const event of responseStream.body) {
+      /** @type {{ generation: string }} */
+      if (event.chunk) {
+        const chunk = JSON.parse(new TextDecoder().decode(event.chunk.bytes));
+        if (chunk.generation) {
+          yield chunk.generation;
+        }
+      }
+    }
+  } else {
+    throw new Error("responseStream.body is undefined")
+  }
+}
