@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 use tauri::{command, State};
 use dirs;
+use tauri::{Menu, MenuItem, CustomMenuItem, Submenu};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 struct UserConfig {
@@ -33,6 +34,7 @@ fn get_config_path() -> std::path::PathBuf {
     config_dir
 }
 
+// TODO this should fill in missing values with defaults
 fn read_config() -> UserConfig {
     let config_path = get_config_path();
     if config_path.exists() {
@@ -73,8 +75,23 @@ fn main() {
     let config = read_config();
     let config_state = ConfigState(std::sync::Mutex::new(config));
 
+    let menu = Menu::new()
+        .add_submenu(Submenu::new("Menu", Menu::new()
+            .add_item(CustomMenuItem::new("preferences", "Preferences"))));
+
     tauri::Builder::default()
         .manage(config_state)
+        .menu(menu)
+        .on_menu_event(|event| {
+            match event.menu_item_id() {
+                "preferences" => {
+                    println!("Event {:?} clicked", event);
+                }
+                _ => {
+                    println!("Event {:?} not recognized.", event);
+                }
+            }
+        })
         .invoke_handler(tauri::generate_handler![get_user_config, update_user_config])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
