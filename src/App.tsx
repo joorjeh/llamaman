@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Box, TextField, Button, CircularProgress, Modal, Typography } from '@mui/material';
+import { Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { default_tool_system_prompt } from './prompts/default_tool_system_prompt';
 import { getAWSStreamingResponse, getOllamaStreamingResponse } from './platforms';
@@ -38,12 +39,13 @@ function App() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handlePlatformChange = async (newPlatform: string) => {
-    if (config) {
-      const newConfig = { ...config, platform: newPlatform };
-      await updateUserConfig(newConfig);
-      setConfig(newConfig);
-    }
+  const handleConfigUpdate = async (e: any) => {
+    console.log(e.target.value);
+    // if (config) {
+    //   const newConfig = { ...config, platform: newPlatform };
+    //   await updateUserConfig(newConfig);
+    //   setConfig(newConfig);
+    // }
   };
 
   // Load config on app load
@@ -200,12 +202,56 @@ function App() {
           boxShadow: 24,
           p: 4,
         }}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Config
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            Your settings content goes here.
-          </Typography>
+          <Box sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <Typography
+              id="modal-modal-title"
+              variant="h6"
+              component="h2"
+            >
+              Config
+            </Typography>
+            <FormControl fullWidth margin="normal">
+              <InputLabel>Platform</InputLabel>
+              <Select
+                labelId="platform-label"
+                label="Platform"
+                variant="outlined"
+                value={selectedPlatform}
+                onChange={(event) => setSelectedPlatform(event.target.value)}
+              >
+                <MenuItem value="">Select a platform</MenuItem>
+                <MenuItem value="aws">AWS</MenuItem>
+                <MenuItem value="ollama">Ollama</MenuItem>
+              </Select>
+              <TextField
+                label="Model"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+              />
+              <TextField
+                label="URL"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                value={config?.url}
+              />
+              <Button
+                variant="contained"
+                color="primary"
+                fullWidth
+                onSubmit={handleConfigUpdate}
+                sx={{ mt: 2 }}
+              >
+                Get Values
+              </Button>
+            </FormControl>
+          </Box>
         </Box>
       </Modal>
     </>
