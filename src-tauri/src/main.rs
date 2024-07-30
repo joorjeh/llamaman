@@ -37,7 +37,13 @@ fn read_config() -> UserConfig {
     let config_path = get_config_path();
     if config_path.exists() {
         let config_str = fs::read_to_string(config_path).expect("Failed to read config file");
-        toml::from_str(&config_str).unwrap_or_default()
+        match toml::from_str(&config_str) {
+            Ok(config) => config,
+            Err(e) => {
+                println!("Error parsing config file: {}", e);
+                UserConfig::default()
+            }
+        }
     } else {
         let default_config = UserConfig::default();
         write_config(&default_config);
