@@ -75,23 +75,8 @@ fn main() {
     let config = read_config();
     let config_state = ConfigState(std::sync::Mutex::new(config));
 
-    let menu = Menu::new()
-        .add_submenu(Submenu::new("Menu", Menu::new()
-            .add_item(CustomMenuItem::new("preferences", "Preferences"))));
-
     tauri::Builder::default()
         .manage(config_state)
-        .menu(menu)
-        .on_menu_event(|event| {
-            match event.menu_item_id() {
-                "preferences" => {
-                    println!("Event {:?} clicked", event);
-                }
-                _ => {
-                    println!("Event {:?} not recognized.", event);
-                }
-            }
-        })
         .invoke_handler(tauri::generate_handler![get_user_config, update_user_config])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
