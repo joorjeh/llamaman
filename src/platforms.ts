@@ -3,6 +3,14 @@ import {
   InvokeModelWithResponseStreamCommand
 } from '@aws-sdk/client-bedrock-runtime';
 
+interface StreamingArgs {
+  prompt: string;
+  model?: string;
+  url?: string;
+  temperature?: number;
+  top_p?: number;
+}
+
 const client = new BedrockRuntimeClient({
   region: 'us-west-2',
   credentials: {
@@ -15,20 +23,21 @@ export async function* getOllamaStreamingResponse({
   prompt,
   model = 'llama3.1',
   url = 'http://localhost:11434/api/generate',
-}: {
-  prompt: string;
-  model?: string;
-  url?: string;
-}): AsyncGenerator<string> {
+  temperature = 0.0,
+  top_p = 0.9,
+}: StreamingArgs): AsyncGenerator<string> {
   const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: model,
       prompt: prompt,
+      model: model,
+      temperature,
+      top_p,
       stream: true,
+      raw: true,
     }),
   });
 
@@ -60,24 +69,16 @@ export async function* getOllamaStreamingResponse({
 
 export async function* getAWSStreamingResponse({
   prompt,
-  max_gen_len,
   model = 'meta.llama3-1-70b-instruct-v1:0',
   temperature = 0.0,
   top_p = 0.9,
-}: {
-  prompt: string;
-  max_gen_len?: number;
-  model?: string;
-  temperature?: number;
-  top_p?: number;
-}): AsyncGenerator<string> {
+}: StreamingArgs): AsyncGenerator<string> {
   const responseStream = await client.send(
     new InvokeModelWithResponseStreamCommand({
       contentType: "application/json",
       modelId: model,
       body: JSON.stringify({
         prompt,
-        max_gen_len,
         temperature,
         top_p,
       }),
