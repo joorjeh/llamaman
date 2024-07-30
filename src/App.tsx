@@ -3,7 +3,6 @@ import { Box, TextField, Button } from '@mui/material';
 import { default_tool_system_prompt } from './prompts/default_tool_system_prompt';
 import { getAWSStreamingResponse, getOllamaStreamingResponse } from './platforms';
 import { invoke } from '@tauri-apps/api/tauri';
-import StreamingArgs from './types/StreamingArgs.ts';
 
 interface Message {
   text: string;
@@ -29,9 +28,8 @@ function App() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState<string>('');
   const [prompt, setPrompt] = useState<string>(default_tool_system_prompt);
-  const [streamingFunction, setStreamingFunction] = useState<>(getAWSStreamingResponse)
   const [config, setConfig] = useState<UserConfig>({
-    platform: 'aws',
+    platform: 'ollama',
   });
 
   const scrollToBottom = () => {

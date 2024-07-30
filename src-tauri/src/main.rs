@@ -14,7 +14,8 @@ struct UserConfig {
 impl Default for UserConfig {
     fn default() -> Self {
         UserConfig {
-            platform: "aws".to_string(),
+            platform: "ollama".to_string(),
+            url: "http://localhost:11434/api/generate".to_string(),
         }
     }
 }
