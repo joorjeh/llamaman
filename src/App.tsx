@@ -1,14 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
-import { Box, TextField, Button, CircularProgress, Modal, Typography, Select, FormControl, MenuItem } from '@mui/material';
+import { Box, TextField, Button, CircularProgress, Modal, Select, MenuItem } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { default_tool_system_prompt } from './prompts/default_tool_system_prompt';
 import { getAWSStreamingResponse, getOllamaStreamingResponse } from './platforms';
 import { invoke } from '@tauri-apps/api/tauri';
-
-interface Message {
-  text: string;
-  sender: string;
-}
+import MessageBox from './MessageBox';
 
 interface UserConfig {
   platform: string;
@@ -145,18 +141,7 @@ function App() {
             }}>
             {
               messages.map((message, index) => (
-                <Box
-                  key={index}
-                  sx={{
-                    display: 'flex',
-                    justifyContent: message.sender === 'ai' ? 'flex-end' : 'flex-start',
-                    marginTop: index === 0 ? 'auto' : 'initial'
-                  }}
-                >
-                  <Box sx={{ maxWidth: '70%', whiteSpace: 'pre-wrap' }}>
-                    {message.text}
-                  </Box>
-                </Box>
+                <MessageBox message={message} index={index} />
               ))
             }
             <div ref={messagesEndRef} />
