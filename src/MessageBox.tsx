@@ -1,12 +1,27 @@
 import { Box } from "@mui/material"
+import Sender from './types/Sender';
 import Message from './types/Message';
 
 const MessageBox = ({ message, index }: { message: Message, index: number }) => {
+  let alignment;
+  switch (message.sender) {
+    case Sender.AI:
+      alignment = 'flex-end';
+      break;
+    case Sender.USER:
+      alignment = 'flex-start';
+      break;
+    case Sender.SYSTEM:
+      alignment = 'flex-center';
+      break;
+    default:
+  }
+
   return (
     <Box
       sx={{
         display: 'flex',
-        justifyContent: message.sender === 'ai' ? 'flex-end' : 'flex-start',
+        justifyContent: alignment,
         marginTop: index === 0 ? 'auto' : 'initial',
       }}
     >

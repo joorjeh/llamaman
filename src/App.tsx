@@ -6,6 +6,7 @@ import { getAWSStreamingResponse, getOllamaStreamingResponse } from './platforms
 import { invoke } from '@tauri-apps/api/tauri';
 import MessageBox from './MessageBox';
 import Message from './types/Message';
+import Sender from './types/Sender';
 import { searchFunctionTags, parseFunctionArgs } from './utils';
 import Tool from './types/Tool';
 import tools from './tools';
@@ -28,13 +29,14 @@ async function updateUserConfig(newConfig: UserConfig): Promise<void> {
 function App() {
   const [isLoading, setLoading] = useState<boolean>(true);
   const [configSaving, setConfigSaving] = useState<boolean>(false);
+  const [queryingModel, setQueryingModel] = useState<boolean>(false);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const messagesEndRef = useRef<any>(null); // TODO determine correct type
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState<string>('');
   const [platform, setPlatform] = useState<string | null>(null);
   const [url, setUrl] = useState<string | null>(null);
-  const [prompt, setPrompt] = useState<string>(default_tool_system_prompt);
+  const prompt = useRef<string>(default_tool_system_prompt);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -74,29 +76,27 @@ function App() {
   const clearChat = (e: any) => {
     e.preventDefault();
     setMessages([]);
-    setPrompt(default_tool_system_prompt);
+    prompt.current = default_tool_system_prompt;
   }
 
-  const handleSendMessage = async (e: any) => {
-    e.preventDefault();
-    if (inputMessage.trim() !== '') {
-      let updatedPrompt = prompt;
-      updatedPrompt += inputMessage;
-      updatedPrompt += "<|eot_id|><|start_header_id|>assistant<|end_header_id|>";
-      setPrompt(updatedPrompt); // in case the response throws error
-      setMessages(prevMessages => [...prevMessages, { text: inputMessage, sender: 'user' }]);
-      setInputMessage('');
+  const handleSendMessage = async (message: Message) => {
+    setQueryingModel(true);
+    setInputMessage('');
+    if (message) {
+      prompt.current += message.text;
+      prompt.current += "<|eot_id|><|start_header_id|>assistant<|end_header_id|>";
+      setMessages(prevMessages => [...prevMessages, message]);
 
       try {
-        setMessages(prevMessages => [...prevMessages, { text: '', sender: 'ai' }]);
+        setMessages(prevMessages => [...prevMessages, { text: '', sender: Sender.AI }]);
 
         if (platform) {
           // TODO streamingFunctions shoudl be handled differently, not a match statement
           let aiResponse: string = "";
           for await (const chunk of platform === 'aws' ? getAWSStreamingResponse({
-            prompt: updatedPrompt,
+            prompt: prompt.current,
           }) : getOllamaStreamingResponse({
-            prompt: updatedPrompt,
+            prompt: prompt.current,
           })) {
             aiResponse += chunk;
             setMessages(prevMessages => {
@@ -106,16 +106,23 @@ function App() {
             });
           }
 
+          prompt.current += aiResponse;
           const funcDescription = searchFunctionTags(aiResponse);
           if (funcDescription) {
             const tool: Tool = tools[funcDescription.name]
             const parsedArgs = parseFunctionArgs(funcDescription.args, tool.args);
-            console.log("Function returned value ", tool.f(parsedArgs));
+            const returnValue = tool.f(parsedArgs);
+            prompt.current += "<|eot_id|><|start_header_id|>system<|end_header_id|>";
+            const systemMessage: Message = {
+              text: `Function ${funcDescription.name} was called and returned ${returnValue}.`,
+              sender: Sender.USER,
+            }
+            await handleSendMessage(systemMessage);
+            console.log(`Function ${funcDescription.name} was called and returned ${returnValue}.`);
+          } else {
+            prompt.current += "<|eot_id|><|start_header_id|>user<|end_header_id|>";
+            setQueryingModel(false);
           }
-
-          updatedPrompt += aiResponse;
-          updatedPrompt += "<|eot_id|><|start_header_id|>user<|end_header_id|>";
-          setPrompt(updatedPrompt);
         }
       } catch (error: any) {
         console.error("Error: ", error.toString())
@@ -160,7 +167,13 @@ function App() {
           </Box>
           <Box
             component="form"
-            onSubmit={handleSendMessage}
+            onSubmit={async (e: any) => {
+              e.preventDefault();
+              await handleSendMessage({
+                text: inputMessage,
+                sender: Sender.USER,
+              });
+            }}
             sx={{
               display: 'flex',
               gap: '10px',
@@ -174,8 +187,9 @@ function App() {
               onChange={(e) => setInputMessage(e.target.value)}
               placeholder="Type a message..."
               sx={{ height: '100%' }}
+              disabled={queryingModel}
             />
-            <Button type="submit" variant="contained" sx={{ height: '56px' }}>Send</Button>
+            <Button variant="contained" type="submit" sx={{ height: '56px' }}>Send</Button>
             <Button variant="contained" onClick={clearChat} sx={{ height: '56px' }}>Clear</Button>
             <Button>
               <SettingsIcon
