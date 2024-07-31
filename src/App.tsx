@@ -30,6 +30,7 @@ function App() {
   const [isLoading, setLoading] = useState<boolean>(true);
   const [configSaving, setConfigSaving] = useState<boolean>(false);
   const [queryingModel, setQueryingModel] = useState<boolean>(false);
+  const steps = useRef<number>(0);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const messagesEndRef = useRef<any>(null); // TODO determine correct type
   const [messages, setMessages] = useState<Message[]>([]);
@@ -109,16 +110,20 @@ function App() {
           prompt.current += aiResponse;
           const funcDescription = searchFunctionTags(aiResponse);
           if (funcDescription) {
-            const tool: Tool = tools[funcDescription.name]
-            const parsedArgs = parseFunctionArgs(funcDescription.args, tool.args);
-            const returnValue = tool.f(parsedArgs);
-            prompt.current += "<|eot_id|><|start_header_id|>system<|end_header_id|>";
-            const systemMessage: Message = {
-              text: `Function ${funcDescription.name} was called and returned ${returnValue}.`,
-              sender: Sender.SYSTEM,
+            // TODO setup config to make max_steps
+            if (steps.current < 10) {
+              const tool: Tool = tools[funcDescription.name]
+              const parsedArgs = parseFunctionArgs(funcDescription.args, tool.args);
+              const returnValue = tool.f(parsedArgs);
+              prompt.current += "<|eot_id|><|start_header_id|>system<|end_header_id|>";
+              const systemMessage: Message = {
+                text: `Function '${funcDescription.name}' was called and returned ${returnValue}.`,
+                sender: Sender.SYSTEM,
+              }
+              await handleSendMessage(systemMessage);
+            } else {
+              // TODO display message to user telling that that max steps was reached
             }
-            await handleSendMessage(systemMessage);
-            console.log(`Function ${funcDescription.name} was called and returned ${returnValue}.`);
           } else {
             prompt.current += "<|eot_id|><|start_header_id|>user<|end_header_id|>";
             setQueryingModel(false);

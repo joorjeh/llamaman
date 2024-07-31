@@ -12,7 +12,7 @@ const MessageBox = ({ message, index }: { message: Message, index: number }) => 
       alignment = 'flex-start';
       break;
     case Sender.SYSTEM:
-      alignment = 'flex-center';
+      alignment = 'center';
       break;
     default:
   }
@@ -25,18 +25,31 @@ const MessageBox = ({ message, index }: { message: Message, index: number }) => 
         marginTop: index === 0 ? 'auto' : 'initial',
       }}
     >
-      <Box
-        sx={{
-          maxWidth: '70%',
-          padding: '10px',
-          borderRadius: '10px',
-          border: '1px solid lightgrey',
-          backgroundColor: 'lightblue',
-          whiteSpace: 'pre-wrap'
-        }}
-      >
-        {message.text}
-      </Box>
+      {
+        message.sender === Sender.SYSTEM ?
+          <Box
+            sx={{
+              maxWidth: '70%',
+              padding: '10px',
+              whiteSpace: 'pre-wrap',
+              fontStyle: 'italic',
+            }}
+          >
+            {message.text}
+          </Box> :
+          <Box
+            sx={{
+              maxWidth: '70%',
+              padding: '10px',
+              borderRadius: '10px',
+              border: '1px solid lightgrey',
+              backgroundColor: 'lightblue',
+              whiteSpace: 'pre-wrap'
+            }}
+          >
+            {message.text}
+          </Box>
+      }
     </Box>
   )
 }
