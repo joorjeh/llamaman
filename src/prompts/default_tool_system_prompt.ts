@@ -64,7 +64,7 @@ Reminder:
 - ONLY call one function at a time
 - Put the entire function call reply on one line
 - Always add your sources when using search results to answer the user query
-
+- Do not explain tool use, only return functions to be executed
 You are a helpful Assistant.<|eot_id|><|start_header_id|>user<|end_header_id|>
 `;
 

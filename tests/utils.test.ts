@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { searchFunctionTags } from '../src/utils.ts'
+import { searchFunctionTags, analyzeFunction } from '../src/utils.ts'
 
 describe('Function Tag Tests', () => {
   test('function tags found', () => {
@@ -9,12 +9,12 @@ Note: This function call is based on the 'add' function provided. The parameters
 `
     const actual = searchFunctionTags(s);
     const expected = {
-      add: {
+      name: 'add',
+      args: {
         a: 119,
         b: 991,
       }
     }
-    console.log(actual);
     expect(actual).toStrictEqual(expected);
   })
 
@@ -25,12 +25,23 @@ Note: This function call is based on the 'multiply' function provided. The param
 `
     const actual = searchFunctionTags(s);
     const expected = {
-      multiply: {
+      name: 'multiply',
+      args: {
         x: 5,
         y: 7,
       }
     }
-    console.log(actual);
     expect(actual).toStrictEqual(expected);
   })
 })
+
+describe('Function type analyzer tests', () => {
+  test('Correctly gets type of fucntion arguments', () => {
+    const f = (a: number, b: string, c: boolean): string => {
+      return a + b + c;
+    }
+    const result = analyzeFunction(f);
+    console.log(result);
+    expect(2).toBe(1);
+  });
+});
