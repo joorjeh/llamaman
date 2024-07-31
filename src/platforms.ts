@@ -65,7 +65,7 @@ export async function* getOllamaStreamingResponse({
 export async function* getAWSStreamingResponse({
   prompt,
   signal,
-  model = 'meta.llama3-1-70b-instruct-v1:0',
+  model = 'meta.llama3-1-405b-instruct-v1:0',
   temperature = 0.0,
   top_p = 0.9,
 }: StreamingArgs): AsyncGenerator<string> {
