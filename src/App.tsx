@@ -217,11 +217,11 @@ function App() {
               justifyContent: 'center',
               alignItems: 'center',
               gridTemplateAreas: `
-    "config config"
-    "platform platformSelect"
-    "url urlInput"
-    "save save"
-  `,
+      "config config"
+      "platform platformSelect"
+      "url urlInput"
+      ". save"
+    `,
               gridTemplateColumns: 'auto 1fr',
             }}>
               <Box sx={{ gridArea: 'config' }}>Configuration</Box>
@@ -247,7 +247,7 @@ function App() {
                   setUrl(e.target.value);
                 }}
               />
-              <Button sx={{ gridArea: 'save' }} onClick={handleConfigUpdate} variant="outlined">Save</Button>
+              <Button sx={{ gridArea: 'save', justifySelf: 'end' }} onClick={handleConfigUpdate} variant="contained">Save</Button>
             </Box>
           </Box>
         }
