@@ -115,7 +115,7 @@ function App() {
             prompt.current += "<|eot_id|><|start_header_id|>system<|end_header_id|>";
             const systemMessage: Message = {
               text: `Function ${funcDescription.name} was called and returned ${returnValue}.`,
-              sender: Sender.USER,
+              sender: Sender.SYSTEM,
             }
             await handleSendMessage(systemMessage);
             console.log(`Function ${funcDescription.name} was called and returned ${returnValue}.`);
