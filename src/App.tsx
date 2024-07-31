@@ -34,6 +34,7 @@ function App() {
   const [isLoading, setLoading] = useState<boolean>(true);
   const [configSaving, setConfigSaving] = useState<boolean>(false);
   const [queryingModel, setQueryingModel] = useState<boolean>(false);
+  const [abortDisabled, setAbortDisabled] = useState<boolean>(true);
   const steps = useRef<number>(0);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const messagesEndRef = useRef<any>(null); // TODO determine correct type
@@ -92,11 +93,13 @@ function App() {
       prompt.current += "<|eot_id|><|start_header_id|>assistant<|end_header_id|>";
       setMessages(prevMessages => [...prevMessages, message]);
 
+      let funcDescription;
       try {
         setMessages(prevMessages => [...prevMessages, { text: '', sender: Sender.AI }]);
 
         if (platform) {
           // TODO streamingFunctions shoudl be handled differently, not a match statement
+          setAbortDisabled(false);
           let aiResponse: string = "";
           for await (const chunk of platform === 'aws' ? getAWSStreamingResponse({
             prompt: prompt.current,
@@ -112,9 +115,10 @@ function App() {
               return newMessages;
             });
           }
+          setAbortDisabled(true);
 
           prompt.current += aiResponse;
-          const funcDescription = searchFunctionTags(aiResponse);
+          funcDescription = searchFunctionTags(aiResponse);
           if (funcDescription) {
             // TODO setup config to make max_steps
             if (steps.current < 10) {
@@ -128,7 +132,11 @@ function App() {
               }
               await handleSendMessage(systemMessage);
             } else {
-              // TODO display message to user telling that that max steps was reached
+              const systemMessage: Message = {
+                text: 'Max function steps reached.',
+                sender: Sender.SYSTEM,
+              }
+              setMessages(prevMessages => [...prevMessages, systemMessage]);
             }
           } else {
             prompt.current += "<|eot_id|><|start_header_id|>user<|end_header_id|>";
@@ -143,6 +151,15 @@ function App() {
             sender: Sender.SYSTEM,
           }
           setMessages(prevMessages => [...prevMessages, systemMessage]);
+        } else if (error.name === 'TypeError') {
+          if (error.toString() === "TypeError: undefined is not an object (evaluating 'tool.args')") {
+            const systemMessage: Message = {
+              text: `Function ${funcDescription!.name} not found`,
+              sender: Sender.SYSTEM,
+            };
+            setMessages(prevMessages => [...prevMessages, systemMessage]);
+            console.error(`Function ${funcDescription!.name} not found`);
+          }
         } else {
           console.error("Error: ", error.toString())
         }
@@ -211,7 +228,7 @@ function App() {
             />
             <Button variant="contained" type="submit" sx={{ height: '56px' }}>Send</Button>
             <Button variant="contained" onClick={clearChat} sx={{ height: '56px' }}>Clear</Button>
-            <Button>
+            <Button disabled={abortDisabled}>
               <StopCircleIcon
                 sx={{
                   height: '40px',

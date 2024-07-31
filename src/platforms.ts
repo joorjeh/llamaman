@@ -4,7 +4,6 @@ import {
 } from '@aws-sdk/client-bedrock-runtime';
 import StreamingArgs from './types/StreamingArgs.ts';
 
-
 const client = new BedrockRuntimeClient({
   region: 'us-west-2',
   credentials: {
