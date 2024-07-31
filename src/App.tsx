@@ -124,6 +124,11 @@ function App() {
             if (steps.current < 10) {
               const tool: Tool = tools[funcDescription.name]
               const parsedArgs = parseFunctionArgs(funcDescription.args, tool.args);
+
+              setMessages(prevMessages => [...prevMessages, {
+                text: `Function ${funcDescription!.name} is being called.`,
+                sender: Sender.SYSTEM,
+              }]);
               const returnValue = tool.f(parsedArgs);
               prompt.current += "<|eot_id|><|start_header_id|>system<|end_header_id|>";
               const systemMessage: Message = {
