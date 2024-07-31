@@ -1,7 +1,5 @@
 {
   "compilerOptions": {
-    "experimentalDecorators": true, // Reflection
-    "emitDecoratorMetadata": true, // Reflection
     "target": "ES2020",
     "useDefineForClassFields": true,
     "lib": [
