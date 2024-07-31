@@ -6,9 +6,9 @@ import { getAWSStreamingResponse, getOllamaStreamingResponse } from './platforms
 import { invoke } from '@tauri-apps/api/tauri';
 import MessageBox from './MessageBox';
 import Message from './types/Message';
-import { searchFunctionTags, analyzeFunction } from './utils';
+import { searchFunctionTags, parseFunctionArgs } from './utils';
+import Tool from './types/Tool';
 import tools from './tools';
-import 'reflect-metadata';
 
 interface UserConfig {
   platform: string;
@@ -108,11 +108,9 @@ function App() {
 
           const funcDescription = searchFunctionTags(aiResponse);
           if (funcDescription) {
-            const f = tools[funcDescription.name].f;
-            console.log("f analysis: ", analyzeFunction(f));
-            console.log("Type of arguments:", ...Array.from(f.arguments).map(arg => typeof arg));
-            console.log("Type of return value:", typeof (f()));
-            console.log("result of f: ", f(funcDescription.args));
+            const tool: Tool = tools[funcDescription.name]
+            const parsedArgs = parseFunctionArgs(funcDescription.args, tool.args);
+            console.log("Function returned value ", tool.f(parsedArgs));
           }
 
           updatedPrompt += aiResponse;

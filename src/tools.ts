@@ -1,21 +1,26 @@
-type Tool = {
-  description: string;
-  f: (...args: any[]) => number | string;
-};
+import Tool from './types/Tool';
 
 const tools: Record<string, Tool> = {
   add: {
     description: 'Adds two numbers',
-    f: ({ a, b }: { a: number, b: number }): number => {
-      return a + b
+    args: {
+      a: "number",
+      b: "number",
+    },
+    f: ({ a, b }: { a: number; b: number }): number => {
+      return a + b;
     }
   },
   multiply: {
     description: 'Multiplies two numbers',
-    f: ({ a, b }: { a: number, b: number }): number => {
+    args: {
+      a: "number",
+      b: "number",
+    },
+    f: ({ a, b }: { a: number; b: number }): number => {
       return a * b;
     }
   }
-}
+};
 
 export default tools;

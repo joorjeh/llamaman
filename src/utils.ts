@@ -1,5 +1,3 @@
-import 'reflect-metadata';
-
 export function searchFunctionTags(input: string): { [key: string]: any } {
   const regex = /<function=(\w+)>(.*?)<\/function>/g;
   const results: { name: string; args: any }[] = [];
@@ -19,21 +17,21 @@ export function searchFunctionTags(input: string): { [key: string]: any } {
   return results[0];
 }
 
-export function analyzeFunction(func: Function): Record<string, string> {
-  const paramTypes = Reflect.getMetadata('design:paramtypes', func) || [];
-  console.log("Param types ", paramTypes);
-  const funcString = func.toString();
-  const argNames = funcString.slice(funcString.indexOf('(') + 1, funcString.indexOf(')'))
-    .split(',')
-    .map(arg => arg.trim())
-    .filter(arg => arg !== '');
-
-  const result: Record<string, string> = {};
-
-  argNames.forEach((name, index) => {
-    const type = paramTypes[index] ? paramTypes[index].name : 'unknown';
-    result[name] = type;
-  });
-
-  return result;
+export function parseFunctionArgs(
+  argValues: Record<string, number | string | boolean>,
+  argTypes: Record<string, string>): Record<string, number | string | boolean> {
+  let parsedArgs: Record<string, number | string | boolean> = {}
+  for (const [key, value] of Object.entries(argTypes)) {
+    switch (value) {
+      case "number":
+        parsedArgs[key] = Number(argValues[key]);
+        break;
+      case "boolean":
+        parsedArgs[key] = Boolean(argValues[key]);
+        break;
+      default:
+        parsedArgs[key] = argValues[key];
+    }
+  }
+  return parsedArgs;
 }
