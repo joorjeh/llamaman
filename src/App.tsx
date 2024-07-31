@@ -199,46 +199,38 @@ function App() {
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
-          width: 400,
           bgcolor: 'background.paper',
           border: '2px solid #000',
           boxShadow: 24,
           p: 4,
         }}>
-          <Box sx={{
+          <FormControl sx={{
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'center',
             justifyContent: 'center'
           }}>
-            <Typography
-              id="modal-modal-title"
-              variant="h6"
-              component="h2"
+            <Box>Configuration</Box>
+            <Select
+              value={platform}
+              label="Platform"
+              onChange={(e) => {
+                setPlatform(e.target.value);
+              }}
             >
-              Config
-            </Typography>
-            <FormControl>
-              <Select
-                value={platform}
-                label="Platform"
-                onChange={(e) => setPlatform(e.target.value)}
-              >
-                <MenuItem value="aws">AWS</MenuItem>
-                <MenuItem value="ollama">Ollama</MenuItem>
-              </Select>
-              <TextField
-                label="URL"
-                name="url"
-                variant="outlined"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-              />
-              <Button onClick={handleConfigUpdate}>
-                Save
-              </Button>
-            </FormControl>
-          </Box>
+              <MenuItem value="aws">AWS</MenuItem>
+              <MenuItem value="ollama">Ollama</MenuItem>
+            </Select>
+            <TextField
+              label="URL"
+              name="url"
+              variant="outlined"
+              value={url}
+              onChange={(e) => {
+                setUrl(e.target.value);
+              }}
+            />
+            <Button onClick={handleConfigUpdate} variant="outlined">Save</Button>
+          </FormControl>
         </Box>
       </Modal>
     </>
