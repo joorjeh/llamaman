@@ -27,6 +27,7 @@ async function updateUserConfig(newConfig: UserConfig): Promise<void> {
 
 function App() {
   const [isLoading, setLoading] = useState<boolean>(true);
+  const [configSaving, setConfigSaving] = useState<boolean>(false);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const messagesEndRef = useRef<any>(null); // TODO determine correct type
   const [messages, setMessages] = useState<Message[]>([]);
@@ -39,14 +40,17 @@ function App() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleConfigUpdate = async (e: any) => {
+  const handleConfigUpdate = (e: any) => {
     e.preventDefault();
+    setConfigSaving(true);
     const newConfig = {
       platform: platform!,
       url: url!,
     }
-    await updateUserConfig(newConfig);
-    setOpenModal(false);
+    updateUserConfig(newConfig).then(() => {
+      setOpenModal(false);
+      setConfigSaving(false);
+    });
   };
 
   // Load config on app load
@@ -195,56 +199,58 @@ function App() {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          width: '50vw',
-          transform: 'translate(-50%, -50%)',
-          bgcolor: 'background.paper',
-          borderRadius: '10px',
-          boxShadow: 24,
-          p: 4,
-        }}>
+        {configSaving ? <CircularProgress /> :
           <Box sx={{
-            display: 'grid',
-            gap: '10px',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gridTemplateAreas: `
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            width: '50vw',
+            transform: 'translate(-50%, -50%)',
+            bgcolor: 'background.paper',
+            borderRadius: '10px',
+            boxShadow: 24,
+            p: 4,
+          }}>
+            <Box sx={{
+              display: 'grid',
+              gap: '10px',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gridTemplateAreas: `
     "config config"
     "platform platformSelect"
     "url urlInput"
     "save save"
   `,
-            gridTemplateColumns: 'auto 1fr',
-          }}>
-            <Box sx={{ gridArea: 'config' }}>Configuration</Box>
-            <Box sx={{ gridArea: 'platform' }}>Platform</Box>
-            <Box sx={{ gridArea: 'platformSelect' }}>
-              <Select
-                value={platform}
+              gridTemplateColumns: 'auto 1fr',
+            }}>
+              <Box sx={{ gridArea: 'config' }}>Configuration</Box>
+              <Box sx={{ gridArea: 'platform' }}>Platform</Box>
+              <Box sx={{ gridArea: 'platformSelect' }}>
+                <Select
+                  value={platform}
+                  onChange={(e) => {
+                    setPlatform(e.target.value);
+                  }}
+                >
+                  <MenuItem value="aws">AWS</MenuItem>
+                  <MenuItem value="ollama">Ollama</MenuItem>
+                </Select>
+              </Box>
+              <Box sx={{ gridArea: 'url' }}>URL</Box>
+              <TextField
+                sx={{ gridArea: 'urlInput' }}
+                name="url"
+                variant="outlined"
+                value={url}
                 onChange={(e) => {
-                  setPlatform(e.target.value);
+                  setUrl(e.target.value);
                 }}
-              >
-                <MenuItem value="aws">AWS</MenuItem>
-                <MenuItem value="ollama">Ollama</MenuItem>
-              </Select>
+              />
+              <Button sx={{ gridArea: 'save' }} onClick={handleConfigUpdate} variant="outlined">Save</Button>
             </Box>
-            <Box sx={{ gridArea: 'url' }}>URL</Box>
-            <TextField
-              sx={{ gridArea: 'urlInput' }}
-              name="url"
-              variant="outlined"
-              value={url}
-              onChange={(e) => {
-                setUrl(e.target.value);
-              }}
-            />
-            <Button sx={{ gridArea: 'save' }} onClick={handleConfigUpdate} variant="outlined">Save</Button>
           </Box>
-        </Box>
+        }
       </Modal >
     </>
   );
