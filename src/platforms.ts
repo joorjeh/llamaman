@@ -4,6 +4,7 @@ import {
 } from '@aws-sdk/client-bedrock-runtime';
 import StreamingArgs from './types/StreamingArgs.ts';
 
+
 const client = new BedrockRuntimeClient({
   region: 'us-west-2',
   credentials: {
@@ -14,12 +15,14 @@ const client = new BedrockRuntimeClient({
 
 export async function* getOllamaStreamingResponse({
   prompt,
+  signal,
   model = 'llama3.1',
   url = 'http://localhost:11434/api/generate',
   temperature = 0.0,
   top_p = 0.9,
 }: StreamingArgs): AsyncGenerator<string> {
   const response = await fetch(url, {
+    signal,
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -62,21 +65,22 @@ export async function* getOllamaStreamingResponse({
 
 export async function* getAWSStreamingResponse({
   prompt,
+  signal,
   model = 'meta.llama3-1-70b-instruct-v1:0',
   temperature = 0.0,
   top_p = 0.9,
 }: StreamingArgs): AsyncGenerator<string> {
-  const responseStream = await client.send(
-    new InvokeModelWithResponseStreamCommand({
-      contentType: "application/json",
-      modelId: model,
-      body: JSON.stringify({
-        prompt,
-        temperature,
-        top_p,
-      }),
+  const command = new InvokeModelWithResponseStreamCommand({
+    contentType: "application/json",
+    modelId: model,
+    body: JSON.stringify({
+      prompt,
+      temperature,
+      top_p,
     }),
-  );
+  });
+
+  const responseStream = await client.send(command, { abortSignal: signal });
 
   if (responseStream.body) {
     for await (const event of responseStream.body) {

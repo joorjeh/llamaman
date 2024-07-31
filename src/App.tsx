@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Box, TextField, Button, CircularProgress, Modal, Select, MenuItem } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
+import StopCircleIcon from '@mui/icons-material/StopCircle';
 import { default_tool_system_prompt } from './prompts/default_tool_system_prompt';
 import { getAWSStreamingResponse, getOllamaStreamingResponse } from './platforms';
 import { invoke } from '@tauri-apps/api/tauri';
@@ -10,6 +11,9 @@ import Sender from './types/Sender';
 import { searchFunctionTags, parseFunctionArgs } from './utils';
 import Tool from './types/Tool';
 import tools from './tools';
+
+const controller = new AbortController();
+const signal = controller.signal;
 
 interface UserConfig {
   platform: string;
@@ -96,8 +100,10 @@ function App() {
           let aiResponse: string = "";
           for await (const chunk of platform === 'aws' ? getAWSStreamingResponse({
             prompt: prompt.current,
+            signal: signal,
           }) : getOllamaStreamingResponse({
             prompt: prompt.current,
+            signal: signal,
           })) {
             aiResponse += chunk;
             setMessages(prevMessages => {
@@ -130,7 +136,16 @@ function App() {
           }
         }
       } catch (error: any) {
-        console.error("Error: ", error.toString())
+        setQueryingModel(false);
+        if (error.name === 'AbortError') {
+          const systemMessage: Message = {
+            text: 'Message stream aborted',
+            sender: Sender.SYSTEM,
+          }
+          setMessages(prevMessages => [...prevMessages, systemMessage]);
+        } else {
+          console.error("Error: ", error.toString())
+        }
       }
     }
   }
@@ -196,6 +211,15 @@ function App() {
             />
             <Button variant="contained" type="submit" sx={{ height: '56px' }}>Send</Button>
             <Button variant="contained" onClick={clearChat} sx={{ height: '56px' }}>Clear</Button>
+            <Button>
+              <StopCircleIcon
+                sx={{
+                  height: '40px',
+                  width: '40px'
+                }}
+                onClick={() => controller.abort()}
+              />
+            </Button>
             <Button>
               <SettingsIcon
                 sx={{

@@ -5,9 +5,9 @@ Cutting Knowledge Date: December 2023
 Today Date: 23 Jul 2024
 
 # Tool Instructions
-- When looking for real time information use relevant functions if available else fallback to brave_search
 - If multiple tools are available ONLY return one tool at a time.  The user will return the result
   of the function call in a multi-turn conversation which will determine the next tool to be used.
+
 
 You have access to the following functions:
 
@@ -58,7 +58,7 @@ Here is an example,
 <function=example_function_name>{"example_name": "example_value"}</function>
 
 Reminder:
-- ONLY call functions that you have access to
+- ONLY call functions listed in available functions
 - Function calls MUST follow the specified format
 - Required parameters MUST be specified
 - ONLY call one function at a time
