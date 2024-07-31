@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { searchFunctionTags, analyzeFunction } from '../src/utils.ts'
+import { searchFunctionTags, parseFunctionArgs } from '../src/utils.ts'
 
 describe('Function Tag Tests', () => {
   test('function tags found', () => {
@@ -35,13 +35,41 @@ Note: This function call is based on the 'multiply' function provided. The param
   })
 })
 
-describe('Function type analyzer tests', () => {
-  test('Correctly gets type of fucntion arguments', () => {
-    const f = (a: number, b: string, c: boolean): string => {
-      return a + b + c;
+describe('Parse function arguments', () => {
+  test('Correctly parses arguments', () => {
+    const argValues = {
+      a: "191",
+      b: "102",
+    };
+    const argTypes = {
+      a: "number",
+      b: "number",
     }
-    const result = analyzeFunction(f);
-    console.log(result);
-    expect(2).toBe(1);
+    const expected = {
+      a: 191,
+      b: 102,
+    }
+    const parsedArgs = parseFunctionArgs(argValues, argTypes);
+    expect(parsedArgs).toStrictEqual(expected);
+  });
+
+  test('Correctly parses different argument types', () => {
+    const argValues = {
+      x: "true",
+      y: "hello",
+      z: "3.14",
+    };
+    const argTypes = {
+      x: "boolean",
+      y: "string",
+      z: "number",
+    }
+    const expected = {
+      x: true,
+      y: "hello",
+      z: 3.14,
+    }
+    const parsedArgs = parseFunctionArgs(argValues, argTypes);
+    expect(parsedArgs).toStrictEqual(expected);
   });
 });
