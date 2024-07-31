@@ -5,11 +5,14 @@ import { default_tool_system_prompt } from './prompts/default_tool_system_prompt
 import { getAWSStreamingResponse, getOllamaStreamingResponse } from './platforms';
 import { invoke } from '@tauri-apps/api/tauri';
 import MessageBox from './MessageBox';
+import Message from './types/Message';
 
 interface UserConfig {
   platform: string;
   url: string;
 }
+
+
 
 // Get the user config
 async function getUserConfig(): Promise<UserConfig> {
