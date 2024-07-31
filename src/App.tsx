@@ -120,16 +120,18 @@ function App() {
           prompt.current += aiResponse;
           funcDescription = searchFunctionTags(aiResponse);
           if (funcDescription) {
+            setMessages(prevMessages => prevMessages.slice(0, -1));
             // TODO setup config to make max_steps
             if (steps.current < 10) {
               const tool: Tool = tools[funcDescription.name]
               const parsedArgs = parseFunctionArgs(funcDescription.args, tool.args);
 
               setMessages(prevMessages => [...prevMessages, {
-                text: `Function ${funcDescription!.name} is being called.`,
+                text: `Calling function '${funcDescription!.name}'`,
                 sender: Sender.SYSTEM,
               }]);
               const returnValue = tool.f(parsedArgs);
+
               prompt.current += "<|eot_id|><|start_header_id|>system<|end_header_id|>";
               const systemMessage: Message = {
                 text: `Function '${funcDescription.name}' was called and returned ${returnValue}.`,
@@ -283,7 +285,7 @@ function App() {
       "platform platformSelect"
       "url urlInput"
       ". save"
-    `,
+                `,
               gridTemplateColumns: 'auto 1fr',
             }}>
               <Box sx={{ gridArea: 'config' }}>Configuration</Box>
