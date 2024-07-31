@@ -1,4 +1,4 @@
-export function searchFunctionTags(input: string): { [key: string]: any } {
+export function searchFunctionTags(input: string): { name: string; args: any } | null {
   const regex = /<function=(\w+)>(.*?)<\/function>/g;
   const results: { name: string; args: any }[] = [];
 
@@ -14,7 +14,7 @@ export function searchFunctionTags(input: string): { [key: string]: any } {
 
   // NOTE we assume that there is only one function returned by each response,
   // as specified in the system prompt
-  return results[0];
+  return results[0] || null;
 }
 
 export function parseFunctionArgs(
