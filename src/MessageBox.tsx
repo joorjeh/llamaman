@@ -4,7 +4,6 @@ import Message from './types/Message';
 const MessageBox = ({ message, index }: { message: Message, index: number }) => {
   return (
     <Box
-      key={index}
       sx={{
         display: 'flex',
         justifyContent: message.sender === 'ai' ? 'flex-end' : 'flex-start',

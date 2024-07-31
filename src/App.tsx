@@ -87,6 +87,7 @@ function App() {
         setMessages(prevMessages => [...prevMessages, { text: '', sender: 'ai' }]);
 
         if (platform) {
+          // TODO streamingFunctions shoudl be handled differently, not a match statement
           let aiResponse: string = "";
           for await (const chunk of platform === 'aws' ? getAWSStreamingResponse({
             prompt: updatedPrompt,
@@ -96,7 +97,7 @@ function App() {
             aiResponse += chunk;
             setMessages(prevMessages => {
               const newMessages = [...prevMessages];
-              newMessages[newMessages.length - 1].text = aiResponse;
+              newMessages[newMessages.length - 1].text = aiResponse.trimStart();
               return newMessages;
             });
           }
@@ -141,7 +142,7 @@ function App() {
             }}>
             {
               messages.map((message, index) => (
-                <MessageBox message={message} index={index} />
+                <MessageBox key={index} message={message} index={index} />
               ))
             }
             <div ref={messagesEndRef} />
