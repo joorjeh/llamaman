@@ -46,6 +46,7 @@ function App() {
       url: url!,
     }
     await updateUserConfig(newConfig);
+    setOpenModal(false);
   };
 
   // Load config on app load
