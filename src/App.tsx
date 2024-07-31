@@ -199,30 +199,42 @@ function App() {
           position: 'absolute',
           top: '50%',
           left: '50%',
+          width: '50vw',
           transform: 'translate(-50%, -50%)',
           bgcolor: 'background.paper',
-          border: '2px solid #000',
+          borderRadius: '10px',
           boxShadow: 24,
           p: 4,
         }}>
-          <FormControl sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center'
+          <Box sx={{
+            display: 'grid',
+            gap: '10px',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gridTemplateAreas: `
+    "config config"
+    "platform platformSelect"
+    "url urlInput"
+    "save save"
+  `,
+            gridTemplateColumns: 'auto 1fr',
           }}>
-            <Box>Configuration</Box>
-            <Select
-              value={platform}
-              label="Platform"
-              onChange={(e) => {
-                setPlatform(e.target.value);
-              }}
-            >
-              <MenuItem value="aws">AWS</MenuItem>
-              <MenuItem value="ollama">Ollama</MenuItem>
-            </Select>
+            <Box sx={{ gridArea: 'config' }}>Configuration</Box>
+            <Box sx={{ gridArea: 'platform' }}>Platform</Box>
+            <Box sx={{ gridArea: 'platformSelect' }}>
+              <Select
+                value={platform}
+                onChange={(e) => {
+                  setPlatform(e.target.value);
+                }}
+              >
+                <MenuItem value="aws">AWS</MenuItem>
+                <MenuItem value="ollama">Ollama</MenuItem>
+              </Select>
+            </Box>
+            <Box sx={{ gridArea: 'url' }}>URL</Box>
             <TextField
-              label="URL"
+              sx={{ gridArea: 'urlInput' }}
               name="url"
               variant="outlined"
               value={url}
@@ -230,10 +242,10 @@ function App() {
                 setUrl(e.target.value);
               }}
             />
-            <Button onClick={handleConfigUpdate} variant="outlined">Save</Button>
-          </FormControl>
+            <Button sx={{ gridArea: 'save' }} onClick={handleConfigUpdate} variant="outlined">Save</Button>
+          </Box>
         </Box>
-      </Modal>
+      </Modal >
     </>
   );
 }
