@@ -1,3 +1,5 @@
+import tools from '../tools';
+
 export const default_tool_system_prompt: string = `
 <|begin_of_text|><|start_header_id|>system<|end_header_id|>
 
@@ -11,41 +13,7 @@ Today Date: 23 Jul 2024
 
 
 You have access to the following functions:
-
-{
-  "name": "multiply",
-  "description": "Multiply two numbers",
-  "parameters": {
-    "a": {
-      "param_type": "int",
-      "description": "An integer",
-      "required": true
-    },
-    "b": {
-      "param_type": "int",
-      "description": "An integer",
-      "required": true
-    }
-  }
-}
-
-{
-  "name": "add",
-  "description": "Add two numbers",
-  "parameters": {
-    "a": {
-      "param_type": "int",
-      "description": "An integer",
-      "required": true
-    },
-    "b": {
-      "param_type": "int",
-      "description": "An integer",
-      "required": true
-    }
-  }
-}
-
+${Object.values(tools).map(tool => tool.toolDefinition)}
 
 If a you choose to call a function ONLY reply in the following format:
 <{start_tag}={function_name}>{parameters}{end_tag}
@@ -68,4 +36,3 @@ Reminder:
 - Do not explain tool use, only return functions to be executed
 You are a helpful Assistant.<|eot_id|><|start_header_id|>user<|end_header_id|>
 `;
-
