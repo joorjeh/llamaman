@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Box, TextField, Button, CircularProgress, Modal, Select, MenuItem } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import StopCircleIcon from '@mui/icons-material/StopCircle';
@@ -11,6 +12,20 @@ import Sender from './types/Sender';
 import { searchFunctionTags, parseFunctionArgs } from './utils';
 import Tool from './types/Tool';
 import tools from './tools';
+
+const theme = createTheme({
+  components: {
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& .MuiInputBase-root': {
+            fontFamily: 'monospace, sans-serif', // Change this to your desired font
+          },
+        },
+      },
+    },
+  },
+});
 
 
 interface UserConfig {
@@ -176,90 +191,112 @@ function App() {
   }
 
   return (
-    <> {isLoading ? <CircularProgress size={100} /> :
-      <Box sx={{
-        width: '100vw',
-        height: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'fixed',
-      }}>
+    <ThemeProvider theme={theme}>
+      {isLoading ? <CircularProgress size={100} /> :
         <Box sx={{
+          width: '100vw',
+          height: '100vh',
           display: 'flex',
           flexDirection: 'column',
-          gap: '10px',
-          width: '100%',
-          height: '100%',
-          justifyContent: 'flex-end',
-          padding: '10px',
-          boxSizing: 'border-box',
-          overflow: 'hidden',
+          position: 'fixed',
         }}>
-          <Box
-            sx={{
-              flexGrow: 1,
-              overflowY: 'auto',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '10px',
-            }}>
-            {
-              messages.map((message, index) => (
-                <MessageBox key={index} message={message} index={index} />
-              ))
-            }
-            <div ref={messagesEndRef} />
-          </Box>
-          <Box
-            component="form"
-            onSubmit={async (e: any) => {
-              e.preventDefault();
-              await handleSendMessage({
-                text: inputMessage,
-                sender: Sender.USER,
-              });
-            }}
-            sx={{
-              display: 'flex',
-              gap: '10px',
-              alignItems: 'center'
-            }}
-          >
-            <TextField
-              fullWidth
-              variant="outlined"
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              placeholder="Type a message..."
-              sx={{ height: '100%' }}
-              disabled={queryingModel}
-            />
-            <Button variant="contained" type="submit" sx={{ height: '56px' }}>Send</Button>
-            <Button variant="contained" onClick={clearChat} sx={{ height: '56px' }}>Clear</Button>
-            <Button disabled={abortDisabled}>
-              <StopCircleIcon
+          <Box sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '10px',
+            width: '100%',
+            height: '100%',
+            justifyContent: 'flex-end',
+            padding: '10px',
+            boxSizing: 'border-box',
+            overflow: 'hidden',
+          }}>
+            <Box
+              sx={{
+                flexGrow: 1,
+                overflowY: 'auto',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+              }}>
+              {
+                messages.map((message, index) => (
+                  <MessageBox key={index} message={message} index={index} />
+                ))
+              }
+              <div ref={messagesEndRef} />
+            </Box>
+            <Box
+              component="form"
+              onSubmit={async (e: any) => {
+                e.preventDefault();
+                await handleSendMessage({
+                  text: inputMessage,
+                  sender: Sender.USER,
+                });
+              }}
+              sx={{
+                display: 'flex',
+                gap: '10px',
+                alignItems: 'center'
+              }}
+            >
+              <TextField
+                fullWidth
+                variant="outlined"
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                placeholder="Type a message..."
                 sx={{
-                  height: '40px',
-                  width: '40px'
+                  height: '100%'
                 }}
-                onClick={() => {
-                  abortRef.current?.abort();
-                }}
+                disabled={queryingModel}
               />
-            </Button>
-            <Button>
-              <SettingsIcon
+              <Button
+                variant="contained"
+                type="submit"
                 sx={{
-                  height: '40px',
-                  width: '40px'
+                  height: "100%",
+                  fontFamily: "monospace",
                 }}
-                onClick={() => setOpenModal(true)}
-              />
-            </Button>
+              >
+                Send
+              </Button>
+              <Button
+                variant="contained"
+                onClick={clearChat}
+                sx={{
+                  height: "100%",
+                  fontFamily: "monospace",
+                }}
+              >
+                Clear
+              </Button>
+              <Button disabled={abortDisabled}>
+                <StopCircleIcon
+                  sx={{
+                    height: '40px',
+                    width: '40px'
+                  }}
+                  onClick={() => {
+                    abortRef.current?.abort();
+                    setAbortDisabled(true);
+                  }}
+                />
+              </Button>
+              <Button>
+                <SettingsIcon
+                  sx={{
+                    height: '40px',
+                    width: '40px'
+                  }}
+                  onClick={() => setOpenModal(true)}
+                />
+              </Button>
+            </Box>
           </Box>
-        </Box>
-      </Box >
-    }
+        </Box >
+      }
       <Modal
         open={openModal}
         onClose={() => setOpenModal(false)}
@@ -319,7 +356,7 @@ function App() {
           </Box>
         }
       </Modal >
-    </>
+    </ThemeProvider>
   );
 }
 
