@@ -12,8 +12,6 @@ import { searchFunctionTags, parseFunctionArgs } from './utils';
 import Tool from './types/Tool';
 import tools from './tools';
 
-const controller = new AbortController();
-const signal = controller.signal;
 
 interface UserConfig {
   platform: string;
@@ -35,6 +33,7 @@ function App() {
   const [configSaving, setConfigSaving] = useState<boolean>(false);
   const [queryingModel, setQueryingModel] = useState<boolean>(false);
   const [abortDisabled, setAbortDisabled] = useState<boolean>(true);
+  const abortRef = useRef<AbortController | null>(null);
   const steps = useRef<number>(0);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const messagesEndRef = useRef<any>(null); // TODO determine correct type
@@ -98,7 +97,9 @@ function App() {
         setMessages(prevMessages => [...prevMessages, { text: '', sender: Sender.AI }]);
 
         if (platform) {
-          // TODO streamingFunctions shoudl be handled differently, not a match statement
+          const controller = new AbortController();
+          abortRef.current = controller;
+          const signal = controller.signal;
           setAbortDisabled(false);
           let aiResponse: string = "";
           for await (const chunk of platform === 'aws' ? getAWSStreamingResponse({
@@ -242,8 +243,7 @@ function App() {
                   width: '40px'
                 }}
                 onClick={() => {
-                  controller.abort();
-                  setAbortDisabled(false);
+                  abortRef.current?.abort();
                 }}
               />
             </Button>

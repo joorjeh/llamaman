@@ -22,8 +22,8 @@
     "windows": [
       {
         "title": "vogelsang",
-        "width": 1200,
-        "height": 1000
+        "width": 800,
+        "height": 900
       }
     ],
     "security": {

@@ -2,6 +2,7 @@
 name = "vogelsang"
 version = "0.1.0"
 description = "A tool using agent"
+license = "MIT"
 authors = ["you"]
 edition = "2021"
 
