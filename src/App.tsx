@@ -14,13 +14,14 @@ import Tool from './types/Tool';
 import tools from './tools';
 
 const theme = createTheme({
+  typography: {
+    fontFamily: 'monospace, sans-serif',
+  },
   components: {
-    MuiTextField: {
+    MuiCssBaseline: {
       styleOverrides: {
-        root: {
-          '& .MuiInputBase-root': {
-            fontFamily: 'monospace, sans-serif', // Change this to your desired font
-          },
+        body: {
+          fontFamily: 'monospace, sans-serif',
         },
       },
     },
@@ -257,7 +258,6 @@ function App() {
                 type="submit"
                 sx={{
                   height: "100%",
-                  fontFamily: "monospace",
                 }}
               >
                 Send
@@ -267,7 +267,6 @@ function App() {
                 onClick={clearChat}
                 sx={{
                   height: "100%",
-                  fontFamily: "monospace",
                 }}
               >
                 Clear
