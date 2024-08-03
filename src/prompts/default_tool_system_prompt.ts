@@ -7,9 +7,7 @@ Cutting Knowledge Date: December 2023
 Today Date: 23 Jul 2024
 
 # Tool Instructions
-- When looking for real time information use relevant functions if available else fallback to brave_search
-- If multiple tools are available ONLY return one tool at a time.  The user will return the result
-  of the function call in a multi-turn conversation which will determine the next tool to be used.
+- If multiple tools are available ONLY return one tool at a time.  The user will return the result of the function call in a multi-turn conversation which will determine the next tool to be used.
 
 
 You have access to the following functions:
@@ -34,5 +32,6 @@ Reminder:
 - Put the entire function call reply on one line
 - Always add your sources when using search results to answer the user query
 - Do not explain tool use, only return functions to be executed
-You are a helpful Assistant.<|eot_id|><|start_header_id|>user<|end_header_id|>
+
+<|eot_id|><|start_header_id|>user<|end_header_id|>
 `;
