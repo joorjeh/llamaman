@@ -42,8 +42,8 @@ const Configuration = ({
         gridTemplateAreas: `
       "platform platformSelect"
       "url urlInput"
-      "save save"
-                `,
+      "model modelInput"
+      "save save"`,
         gridTemplateColumns: 'auto 1fr',
       }}>
         <Box sx={{ gridArea: 'platform' }}>Platform</Box>
@@ -69,14 +69,28 @@ const Configuration = ({
           name="url"
           variant="outlined"
           value={config!.url}
+          disabled={config!.platform === 'aws'}
           onChange={(e: any) => {
             const newConfig = {
               ...config!,
               url: e.target.value,
             };
             setConfig(newConfig);
-          }
-          }
+          }}
+        />
+        <Box sx={{ gridArea: 'model' }}>Model ID</Box>
+        <TextField
+          sx={{ gridArea: 'modelInput' }}
+          name="model"
+          variant="outlined"
+          value={config!.model}
+          onChange={(e: any) => {
+            const newConfig = {
+              ...config!,
+              model: e.target.value,
+            };
+            setConfig(newConfig);
+          }}
         />
         <Button
           sx={{

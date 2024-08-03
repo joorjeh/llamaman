@@ -10,6 +10,7 @@ use dirs;
 struct UserConfig {
     platform: String,
     url: String,
+    model: String,
 }
 
 impl Default for UserConfig {
@@ -17,6 +18,7 @@ impl Default for UserConfig {
         UserConfig {
             platform: "ollama".to_string(),
             url: "http://localhost:11434/api/generate".to_string(),
+            model: "llama3.1".to_string(),
         }
     }
 }

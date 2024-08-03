@@ -84,10 +84,12 @@ function App() {
         for await (const chunk of config!.platform === 'aws' ? getAWSStreamingResponse({
           prompt: prompt.current,
           signal: signal,
+          model: config!.model,
         }) : getOllamaStreamingResponse({
           prompt: prompt.current,
           signal: signal,
           url: config!.url,
+          model: config!.url,
         })) {
           aiResponse += chunk;
           setMessages(prevMessages => {
