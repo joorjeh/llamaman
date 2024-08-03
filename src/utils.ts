@@ -1,3 +1,6 @@
+import { invoke } from "@tauri-apps/api/tauri";
+import UserConfig from "./types/UserConfig";
+
 export function searchFunctionTags(input: string): { name: string; args: any } | null {
   const regex = /<function=(\w+)>(.*?)<\/function>/g;
   const results: { name: string; args: any }[] = [];
@@ -34,4 +37,12 @@ export function parseFunctionArgs(
     }
   }
   return parsedArgs;
+}
+
+export async function getUserConfig(): Promise<UserConfig> {
+  return await invoke('get_user_config');
+}
+
+export  async function updateUserConfig(newConfig: UserConfig): Promise<void> {
+  await invoke('update_user_config', { newConfig });
 }
