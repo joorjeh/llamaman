@@ -130,7 +130,7 @@ function App() {
                 text: `Calling function '${funcDescription!.name}'`,
                 sender: Sender.SYSTEM,
               }]);
-              const returnValue = tool.f(parsedArgs);
+              const returnValue = await tool.f(parsedArgs);
 
               prompt.current += "<|eot_id|><|start_header_id|>system<|end_header_id|>";
               const systemMessage: Message = {
@@ -241,7 +241,10 @@ function App() {
                   height: '40px',
                   width: '40px'
                 }}
-                onClick={() => controller.abort()}
+                onClick={() => {
+                  controller.abort();
+                  setAbortDisabled(false);
+                }}
               />
             </Button>
             <Button>

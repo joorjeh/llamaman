@@ -70,13 +70,31 @@ fn update_user_config(state: State<ConfigState>, new_config: UserConfig) {
     write_config(&new_config);
 }
 
+#[command]
+fn read_file(filename: String) -> Result<String, String> {
+    let mut config_dir = dirs::home_dir().expect("Failed to get home directory");
+    config_dir.push(".vogelsang");
+    config_dir.push(filename);
+    std::fs::read_to_string(config_dir).map_err(|e| e.to_string())
+}
+
+#[command]
+fn write_file(filename: String, content: String) -> Result<String, String> {
+    let mut config_dir = dirs::home_dir().expect("Failed to get home directory");
+    config_dir.push(".vogelsang");
+    std::fs::create_dir_all(&config_dir).map_err(|e| e.to_string())?;
+    config_dir.push(filename);
+    std::fs::write(&config_dir, content).map_err(|e| format!("Failed to write to file: {}", e))?;
+    Ok("Successfully wrote to file.".to_string())
+}
+
 fn main() {
     let config = read_config();
     let config_state = ConfigState(std::sync::Mutex::new(config));
 
     tauri::Builder::default()
         .manage(config_state)
-        .invoke_handler(tauri::generate_handler![get_user_config, update_user_config])
+        .invoke_handler(tauri::generate_handler![get_user_config, update_user_config, read_file, write_file])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
