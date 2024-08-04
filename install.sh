@@ -5,7 +5,5 @@ if ! bash ./load_tools.sh; then
   exit 1
 fi
 
-if ! yarn && yarn tauri build; then
-  echo "yarn tauri build failed. Exiting"
-  exit 1
-fi
+yarn
+yarn tauri build
