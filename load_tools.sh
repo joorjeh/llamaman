@@ -6,7 +6,7 @@ if ! command -v jq &>/dev/null; then
 fi
 
 input_file="$HOME/.vogelsang/tools.json"
-output_file="$HOME/vogelsang/src/tools.ts"
+output_file="$HOME/.local/vogelsang/src/tools.ts"
 
 #!/bin/bash
 
@@ -46,7 +46,7 @@ EOF
 # Load Rust fns and add names to generate_handler macro
 
 input_file="$HOME/.vogelsang/tools.rs"
-output_file="./src-tauri/src/main.rs"
+output_file="$HOME/.local/vogelsang/src-tauri/src/main.rs"
 
 temp_file=$(mktemp)
 
