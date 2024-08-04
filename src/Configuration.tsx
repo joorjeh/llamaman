@@ -1,7 +1,7 @@
 import { Box, Button, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
 import { updateUserConfig } from "./utils";
 import UserConfig from "./types/UserConfig";
-import { ChangeEvent } from "react";
+import { ChangeEvent, useState } from "react";
 import { modelIds } from "./platforms";
 
 interface ConfigurationProps {
@@ -15,11 +15,12 @@ const Configuration = ({
   setConfig,
   setOpenModal,
 }: ConfigurationProps) => {
+  const [newConfig, setNewConfig] = useState<UserConfig>(config!);
 
   const handleConfigUpdate = (e: any) => {
     e.preventDefault();
-    updateUserConfig(config!).then(() => {
-      setConfig(config);
+    updateUserConfig(newConfig).then(() => {
+      setConfig(newConfig);
       setOpenModal(false);
     });
   };
@@ -51,14 +52,15 @@ const Configuration = ({
         <Box sx={{ gridArea: 'platform' }}>Platform</Box>
         <Box sx={{ gridArea: 'platformSelect' }}>
           <Select
-            value={config!.platform}
+            value={newConfig.platform}
             onChange={(e: SelectChangeEvent) => {
-              const newConfig = {
-                ...config!,
-                platform: e.target.value as string,
-                model: modelIds[e.target.value as string][0],
-              };
-              setConfig(newConfig);
+              setNewConfig(prevConfig => {
+                return {
+                  ...prevConfig,
+                  platform: e.target.value as string,
+                  model: modelIds[e.target.value as string][0],
+                }
+              })
             }}
           >
             <MenuItem value="aws">AWS</MenuItem>
@@ -70,14 +72,15 @@ const Configuration = ({
           sx={{ gridArea: 'urlInput' }}
           name="url"
           variant="outlined"
-          value={config!.url}
-          disabled={config!.platform === 'aws'}
+          value={newConfig.url}
+          disabled={newConfig.platform === 'aws'}
           onChange={(e: ChangeEvent<HTMLInputElement>) => {
-            const newConfig = {
-              ...config!,
-              url: e.target.value as string,
-            };
-            setConfig(newConfig);
+            setNewConfig(prevConfig => {
+              return {
+                ...prevConfig,
+                url: e.target.value as string,
+              }
+            })
           }}
         />
         <Box sx={{ gridArea: 'model' }}>Model ID</Box>
@@ -85,16 +88,17 @@ const Configuration = ({
           sx={{ gridArea: 'modelInput' }}
           name="model"
           variant="outlined"
-          value={config!.model}
+          value={newConfig.model}
           onChange={(e: SelectChangeEvent) => {
-            const newConfig = {
-              ...config!,
-              model: e.target.value as string,
-            };
-            setConfig(newConfig);
+            setNewConfig(prevConfig => {
+              return {
+                ...prevConfig,
+                model: e.target.value as string,
+              }
+            })
           }}
         >
-          {modelIds[config!.platform].map((modelId) => (
+          {modelIds[newConfig.platform].map((modelId) => (
             <MenuItem key={modelId} value={modelId}>
               {modelId}
             </MenuItem>

@@ -89,7 +89,7 @@ function App() {
           prompt: prompt.current,
           signal: signal,
           url: config!.url,
-          model: config!.url,
+          model: config!.model,
         })) {
           aiResponse += chunk;
           setMessages(prevMessages => {
