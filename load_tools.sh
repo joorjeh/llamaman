@@ -43,31 +43,58 @@ cat <<EOF >>"$output_file"
 export default tools;
 EOF
 
-# RUST_TOOLS_FILE="$HOME/.vogelsang/tools.rs"
-# DESTINATION_FILE="$HOME/vogelsang/src-tauri/src/main.rs"
+# Load Rust fns and add names to generate_handler macro
 
-# # Check if source file exists
-# if [ ! -f "$RUST_TOOLS_FILE" ]; then
-#   echo "Error: Source file '$source_file' does not exist."
-#   exit 1
-# fi
+input_file="$HOME/.vogelsang/tools.rs"
+output_file="./src-tauri/src/main.rs"
 
-# # Process the input file and extract function names
-# function_names=$(grep -oP '(?<=fn )\w+(?=\()' "$RUST_TOOLS_FILE" | tr '\n' ' ')
+temp_file=$(mktemp)
 
-# # Read the output file, remove content after "// TOOLS", and store in a temporary file
-# sed '/\/\/ TOOLS/q' "$output_file" >temp_output.rs
+# Copy content up to and including the line with '// TOOLS' to the temp file
+sed '/\/\/ TOOLS/q' "$output_file" >"$temp_file"
 
-# # Append the updated generate_handler macro
-# echo "         .invoke_handler(tauri::generate_handler![" >>temp_output.rs
-# echo "           get_user_config," >>temp_output.rs
-# echo "           update_user_config," >>temp_output.rs
-# for func in $function_names; do
-#   echo "           $func," >>temp_output.rs
-# done
-# echo "         ])" >>temp_output.rs
+# Append the entire source file to the temp file
+cat "$input_file" >>"$temp_file"
 
-# # Append the rest of the content from the input file
-# sed -n '/#\[command\]/,$p' "$RUST_TOOLS_FILE" >>temp_output.rs
+# Replace the destination file with the temp file
+mv "$temp_file" "$output_file"
 
-# echo "Tools loaded successfully"
+# Extract function names from the input file
+function_names=$(grep -oP '(?<=fn )\w+(?=\()' "$input_file")
+
+# Create a temporary file
+temp_file=$(mktemp)
+
+# Process the output file and update the generate_handler macro
+awk -v functions="$function_names" '
+BEGIN {
+    split(functions, func_array, "\n")
+    in_macro = 0
+    printed_update_user_config = 0
+}
+/\.invoke_handler\(tauri::generate_handler!\[/ {
+    print $0
+    in_macro = 1
+    print "            get_user_config,"
+    print "            update_user_config,"
+    for (i in func_array) {
+        print "            " func_array[i] ","
+    }
+    next
+}
+/\]\)/ {
+    if (in_macro) {
+        print $0
+        in_macro = 0
+        next
+    }
+}
+!/get_user_config,/ && !/update_user_config,/ && !in_macro {
+    print $0
+}
+' "$output_file" >"$temp_file"
+
+# Replace the original output file with the updated content
+mv "$temp_file" "$output_file"
+
+echo "Handler macro updated successfully in $output_file"
