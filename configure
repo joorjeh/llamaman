@@ -1,0 +1,44 @@
+#!/bin/bash
+
+if [ ! -d "$HOME/.vogelsang" ]; then
+  mkdir "$HOME/.vogelsang"
+fi
+
+if [ ! -f "$HOME/.vogelsang/config.toml" ]; then
+  cat <<EOF >"$HOME/.vogelsang/config.toml"
+platform = "ollama"
+url = "http://localhost:11434/api/generate"
+model = "llama3.1"
+EOF
+fi
+
+if [ ! -f "$HOME/.vogelsang/tools.json" ]; then
+  cat <<EOF >"$HOME/.vogelsang/tools.json"
+{
+  "add": {
+    "description": "Add two numbers together.",
+    "parameters": {
+      "a": {
+        "param_type": "number",
+        "description": "The first number to add",
+        "required": true
+      },
+      "b": {
+        "param_type": "number",
+        "description": "The second number to add",
+        "required": true
+      }
+    }
+  }
+}
+EOF
+fi
+
+if [ ! -f "$HOME/.vogelsang/tools.rs" ]; then
+  cat <<EOF >"$HOME/.vogelsang/tools.rs"
+#[command]
+fn add(a: i64, b: i64) -> i64 {
+    return a + b;
+}
+EOF
+fi

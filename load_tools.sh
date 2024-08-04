@@ -6,8 +6,8 @@ if ! command -v jq &>/dev/null; then
   exit 1
 fi
 
-input_file="/home/anon/.vogelsang/tools.json"
-output_file="/home/anon/vogelsang/src/tools.ts"
+input_file="$HOME/.vogelsang/tools.json"
+output_file="$HOME/vogelsang/src/tools.ts"
 
 tool_name=$(jq -r 'keys[0]' "$input_file")
 
@@ -36,8 +36,8 @@ cat <<EOF >>"$output_file"
 export default tools;
 EOF
 
-source_file="/home/anon/.vogelsang/tools.rs"
-destination_file="/home/anon/vogelsang/src-tauri/src/main.rs"
+source_file="$HOME/.vogelsang/tools.rs"
+destination_file="$HOME/vogelsang/src-tauri/src/main.rs"
 
 # Check if source file exists
 if [ ! -f "$source_file" ]; then
