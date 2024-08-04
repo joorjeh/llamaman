@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Box, TextField, Button, CircularProgress, Modal, Select, MenuItem } from '@mui/material';
+import { Box, TextField, Button, CircularProgress, Modal } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import StopCircleIcon from '@mui/icons-material/StopCircle';
 import { default_tool_system_prompt } from './prompts/default_tool_system_prompt';
