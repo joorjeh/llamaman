@@ -267,8 +267,10 @@ function App() {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Configuration config={config} setConfig={setConfig} setOpenModal={setOpenModal} />
-      </Modal >
+        <Box>
+          <Configuration config={config} setConfig={setConfig} setOpenModal={setOpenModal} />
+        </Box>
+      </Modal>
     </ThemeProvider>
   );
 }
