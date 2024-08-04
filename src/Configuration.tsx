@@ -2,6 +2,7 @@ import { Box, Button, MenuItem, Select, SelectChangeEvent, TextField } from "@mu
 import { updateUserConfig } from "./utils";
 import UserConfig from "./types/UserConfig";
 import { ChangeEvent } from "react";
+import { modelIds } from "./platforms";
 
 interface ConfigurationProps {
   config: UserConfig | null;
@@ -55,6 +56,7 @@ const Configuration = ({
               const newConfig = {
                 ...config!,
                 platform: e.target.value as string,
+                model: modelIds[e.target.value as string][0],
               };
               setConfig(newConfig);
             }}
@@ -79,19 +81,25 @@ const Configuration = ({
           }}
         />
         <Box sx={{ gridArea: 'model' }}>Model ID</Box>
-        <TextField
+        <Select
           sx={{ gridArea: 'modelInput' }}
           name="model"
           variant="outlined"
           value={config!.model}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+          onChange={(e: SelectChangeEvent) => {
             const newConfig = {
               ...config!,
               model: e.target.value as string,
             };
             setConfig(newConfig);
           }}
-        />
+        >
+          {modelIds[config!.platform].map((modelId) => (
+            <MenuItem key={modelId} value={modelId}>
+              {modelId}
+            </MenuItem>
+          ))}
+        </Select>
         <Button
           sx={{
             gridArea: 'save',
