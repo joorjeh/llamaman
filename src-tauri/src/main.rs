@@ -96,7 +96,11 @@ fn main() {
 
     tauri::Builder::default()
         .manage(config_state)
-        .invoke_handler(tauri::generate_handler![get_user_config, update_user_config, read_file, write_file])
+        .invoke_handler(tauri::generate_handler![get_user_config, update_user_config, read_file, write_file, add])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+#[command]
+fn add(a: i64, b: i64) -> i64 {
+    return a + b;
 }
