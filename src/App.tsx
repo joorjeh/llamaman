@@ -108,10 +108,10 @@ function App() {
           // TODO setup config to make max_steps
           if (steps.current < 10) {
             const tool: Tool = tools[funcDescription.name]
-            const parsedArgs = parseFunctionArgs(funcDescription.args, tool.args);
+            const parsedArgs: Record<string, string | number | boolean> = parseFunctionArgs(funcDescription.args, tool.args);
 
             setMessages(prevMessages => [...prevMessages, {
-              text: `Calling function '${funcDescription!.name}'`,
+              text: `Calling function ${funcDescription!.name}(${Object.values(parsedArgs).join(', ')})`,
               sender: Sender.SYSTEM,
             }]);
             const returnValue = await tool.f(parsedArgs);

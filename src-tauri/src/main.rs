@@ -82,6 +82,7 @@ fn main() {
             get_user_config,
             update_user_config,
             add,
+            multiply,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -91,4 +92,9 @@ fn main() {
 #[command]
 fn add(a: i64, b: i64) -> i64 {
     return a + b;
+}
+
+#[command]
+fn multiply(a: i64, b: i64) -> i64 {
+    return a * b;
 }
