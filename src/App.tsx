@@ -73,6 +73,7 @@ function App() {
       setMessages(prevMessages => [...prevMessages, message]);
 
       let funcDescription;
+      // TODO handle no connection errors
       try {
         setMessages(prevMessages => [...prevMessages, { text: '', sender: Sender.AI }]);
 

@@ -81,9 +81,14 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             get_user_config,
             update_user_config,
+            add,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
 
 // TOOLS
+#[command]
+fn add(a: i64, b: i64) -> i64 {
+    return a + b;
+}

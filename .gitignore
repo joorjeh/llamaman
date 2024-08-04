@@ -34,4 +34,7 @@ dist-ssr
 # User specific tooling
 src/tools.ts
 
+# Vitest coverage
+coverage/
+
 TODO
