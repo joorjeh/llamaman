@@ -45,7 +45,16 @@ if [ ! -f "$source_file" ]; then
   exit 1
 fi
 
-# Append the contents of source file to destination file
+# Find the line number with '// TODO' in the destination file
+todo_line=$(grep -n "// TOOLS" "$destination_file" | cut -d: -f1)
+
+if [ -z "$todo_line" ]; then
+  echo "Error: '// TOOLS' not found in destination file."
+  exit 1
+fi
+
+# Delete all lines below '// TODO' and append the source file
+sed -i "${todo_line}q" "$destination_file"
 cat "$source_file" >>"$destination_file"
 
-echo "Contents of '$source_file' have been appended to '$destination_file'"
+echo "Contents of '$source_file' have been appended to '$destination_file' after '// TODO'"
