@@ -1,6 +1,7 @@
-import { Box, Button, MenuItem, Select, TextField } from "@mui/material";
+import { Box, Button, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
 import { updateUserConfig } from "./utils";
 import UserConfig from "./types/UserConfig";
+import { ChangeEvent } from "react";
 
 interface ConfigurationProps {
   config: UserConfig | null;
@@ -50,14 +51,13 @@ const Configuration = ({
         <Box sx={{ gridArea: 'platformSelect' }}>
           <Select
             value={config!.platform}
-            onChange={(e: any) => {
+            onChange={(e: SelectChangeEvent) => {
               const newConfig = {
                 ...config!,
-                platform: e.target.value,
+                platform: e.target.value as string,
               };
               setConfig(newConfig);
-            }
-            }
+            }}
           >
             <MenuItem value="aws">AWS</MenuItem>
             <MenuItem value="ollama">Ollama</MenuItem>
@@ -70,10 +70,10 @@ const Configuration = ({
           variant="outlined"
           value={config!.url}
           disabled={config!.platform === 'aws'}
-          onChange={(e: any) => {
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
             const newConfig = {
               ...config!,
-              url: e.target.value,
+              url: e.target.value as string,
             };
             setConfig(newConfig);
           }}
@@ -84,10 +84,10 @@ const Configuration = ({
           name="model"
           variant="outlined"
           value={config!.model}
-          onChange={(e: any) => {
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
             const newConfig = {
               ...config!,
-              model: e.target.value,
+              model: e.target.value as string,
             };
             setConfig(newConfig);
           }}
