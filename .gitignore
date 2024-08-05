@@ -38,7 +38,9 @@ src/tools.ts
 # Vitest coverage
 coverage/
 
-# Binaries for local builds
+# Build artifacts
 bin/
+usr/
+DEBIAN/
 
 TODO

@@ -1,12 +1,16 @@
 #!/bin/bash
 
+cd $HOME/.local/vogelsang/
+
 if ! bash ./load_tools.sh; then
   echo "Error: Failed to load tools. Exiting."
   exit 1
 fi
 
 yarn
-yarn tauri build --target appimage
+yarn tauri build --bundles deb
+
+dpkg-deb -R ./src-tauri/target/release/bundle/deb/vogelsang*amd64.deb .
 
 if [ ! -d "bin" ]; then
   mkdir bin
@@ -49,10 +53,11 @@ else
     echo "File .tools_hash does not exist"
     echo "$new_hash" > .tools_hash
     yarn
-    yarn tauri build --target appimage
+    yarn tauri build --bundles deb
 fi
 
-./src-tauri/target/release/bundle/appimage/vogelsang_*.AppImage
+dpkg-deb -R ./src-tauri/target/release/bundle/deb/vogelsang*amd64.deb .
+./usr/bin/vogelsang
 
 EOF
 
