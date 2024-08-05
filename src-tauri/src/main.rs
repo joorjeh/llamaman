@@ -5,6 +5,8 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 use tauri::{command, State};
 use dirs;
+use std::path::PathBuf;
+use toml::Value;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 struct UserConfig {
@@ -12,6 +14,7 @@ struct UserConfig {
     url: String,
     model: String,
 }
+
 
 impl Default for UserConfig {
     fn default() -> Self {
@@ -65,6 +68,31 @@ fn get_user_config(state: State<ConfigState>) -> UserConfig {
     state.0.lock().unwrap().clone()
 }
 
+
+use toml;
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+struct AwsCredentials {
+    aws_access_key_id: String,
+    aws_secret_access_key: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct AwsConfig {
+    default: AwsCredentials,
+}
+
+#[command]
+fn get_aws_credentials() -> AwsCredentials {
+    let home = dirs::home_dir().unwrap();
+    let credentials_path = home.join(".aws").join("credentials");
+    let contents = std::fs::read_to_string(credentials_path).expect("Failed to read credentials file");
+
+    let config: AwsConfig = toml::de::from_str(&contents).expect("Failed to parse toml file");
+    
+    config.default
+}
+
 #[command]
 fn update_user_config(state: State<ConfigState>, new_config: UserConfig) {
     let mut config = state.0.lock().unwrap();
@@ -79,6 +107,7 @@ fn main() {
     tauri::Builder::default()
         .manage(config_state)
         .invoke_handler(tauri::generate_handler![
+            get_aws_credentials,
             get_user_config,
             update_user_config,
             add,

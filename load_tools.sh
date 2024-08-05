@@ -75,6 +75,7 @@ BEGIN {
 /\.invoke_handler\(tauri::generate_handler!\[/ {
     print $0
     in_macro = 1
+    print "            get_aws_credentials,"
     print "            get_user_config,"
     print "            update_user_config,"
     for (i in func_array) {
@@ -89,7 +90,7 @@ BEGIN {
         next
     }
 }
-!/get_user_config,/ && !/update_user_config,/ && !in_macro {
+!/get_aws_credentials,/ && !/get_user_config,/ && !/update_user_config,/ && !in_macro {
     print $0
 }
 ' "$output_file" >"$temp_file"

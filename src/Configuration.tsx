@@ -1,5 +1,5 @@
 import { Box, Button, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
-import { updateUserConfig } from "./utils";
+import { getAwsCredentials, updateUserConfig } from "./utils";
 import UserConfig from "./types/UserConfig";
 import { ChangeEvent, useState } from "react";
 import { modelIds } from "./platforms";
@@ -54,13 +54,17 @@ const Configuration = ({
           <Select
             value={newConfig.platform}
             onChange={(e: SelectChangeEvent) => {
-              setNewConfig(prevConfig => {
-                return {
-                  ...prevConfig,
-                  platform: e.target.value as string,
-                  model: modelIds[e.target.value as string][0],
-                }
-              })
+              if (e.target.value === 'aws') {
+                getAwsCredentials().then();
+              } else {
+                setNewConfig(prevConfig => {
+                  return {
+                    ...prevConfig,
+                    platform: e.target.value as string,
+                    model: modelIds[e.target.value as string][0],
+                  }
+                })
+              }
             }}
           >
             <MenuItem value="aws">AWS</MenuItem>

@@ -43,6 +43,16 @@ export async function getUserConfig(): Promise<UserConfig> {
   return await invoke('get_user_config');
 }
 
-export  async function updateUserConfig(newConfig: UserConfig): Promise<void> {
+export async function updateUserConfig(newConfig: UserConfig): Promise<void> {
   await invoke('update_user_config', { newConfig });
 }
+
+interface AwsCredentials {
+  aws_access_key_id: string;
+  aws_secret_access_key: string;
+}
+
+export async function getAwsCredentials(): Promise<AwsCredentials> {
+  return await invoke('get_aws_credentials');
+}
+
