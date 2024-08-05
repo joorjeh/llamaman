@@ -15,17 +15,27 @@ fi
 if [ ! -f "$HOME/.llamaman/tools.json" ]; then
   cat <<EOF >"$HOME/.llamaman/tools.json"
 {
-  "add": {
-    "description": "Add two numbers together.",
+  "readFile": {
+    "description": "Read the contents of a file.",
     "parameters": {
-      "a": {
-        "param_type": "number",
-        "description": "The first number to add",
+      "filename": {
+        "param_type": "string",
+        "description": "The name of the file to read",
+        "required": true
+      }
+    }
+  },
+  "writeFile": {
+    "description": "Write content to a file.",
+    "parameters": {
+      "filename": {
+        "param_type": "string",
+        "description": "The name of the file to write",
         "required": true
       },
-      "b": {
-        "param_type": "number",
-        "description": "The second number to add",
+      "content": {
+        "param_type": "string",
+        "description": "The content to write to the file",
         "required": true
       }
     }
@@ -36,9 +46,29 @@ fi
 
 if [ ! -f "$HOME/.llamaman/tools.rs" ]; then
   cat <<EOF >"$HOME/.llamaman/tools.rs"
+use std::fs::File;
+use std::io::prelude::*;
+use std::io::Result;
+use std::fs::OpenOptions;
+use std::io::{Write, Result};
+
 #[command]
-fn add(a: i64, b: i64) -> i64 {
-    return a + b;
+fn read_file_contents(filename: &str) -> Result<String> {
+    let mut file = File::open(filename)?;
+    let mut contents = String::new();
+    file.read_to_string(&mut contents)?;
+    Ok(contents)
+}
+
+#[command]
+fn write_file(filename: &str, contents: &str) -> Result<()> {
+    let mut file = OpenOptions::new()
+        .write(true)
+        .create(true)
+        .truncate(true)
+        .open(filename)?;
+    file.write_all(contents.as_bytes())?;
+    Ok(())
 }
 EOF
 fi
