@@ -52,6 +52,7 @@ use std::io::Write;
 use std::io::Read;
 use std::path::PathBuf;
 
+#[command]
 fn read_file(filename: &str) -> Result<String, String> {
     let mut path = PathBuf::new();
     path.push(dirs::home_dir().ok_or_else(|| "Unable to get home directory".to_string())?);
@@ -64,6 +65,7 @@ fn read_file(filename: &str) -> Result<String, String> {
     Ok(contents)
 }
 
+#[command]
 fn write_file(filename: &str, contents: &str) -> Result<String, String> {
     let mut path = PathBuf::new();
     path.push(dirs::home_dir().ok_or_else(|| "Unable to get home directory".to_string())?);
