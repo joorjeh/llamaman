@@ -15,6 +15,7 @@ import Configuration from './Configuration';
 import UserConfig from './types/UserConfig';
 import { BedrockRuntimeClient } from '@aws-sdk/client-bedrock-runtime';
 import AwsCredentials from './types/AwsCredential';
+import { AbortController as AwsAbortController } from '@aws-sdk/abort-controller';
 
 const theme = createTheme({
   typography: {
@@ -35,7 +36,7 @@ function App() {
   const [isLoading, setLoading] = useState<boolean>(true);
   const [queryingModel, setQueryingModel] = useState<boolean>(false);
   const [abortDisabled, setAbortDisabled] = useState<boolean>(true);
-  const abortRef = useRef<AbortController | null>(null);
+  const abortRef = useRef<AbortController | AwsAbortController | null>(null);
   const steps = useRef<number>(0);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const messagesEndRef = useRef<any>(null); // TODO determine correct type
@@ -86,19 +87,20 @@ function App() {
       try {
         setMessages(prevMessages => [...prevMessages, { text: '', sender: Sender.AI }]);
 
-        const controller = new AbortController();
-        abortRef.current = controller;
-        const signal = controller.signal;
+        const abortController = (config!.platform === 'aws') ?
+          new AwsAbortController() :
+          new AbortController();
+        abortRef.current = abortController;
         setAbortDisabled(false);
         let aiResponse: string = "";
         for await (const chunk of config!.platform === 'aws' ? getAWSStreamingResponse({
           client: client!,
           prompt: prompt.current,
-          signal: signal,
+          signal: abortRef.current.signal,
           model: config!.model,
         }) : getOllamaStreamingResponse({
           prompt: prompt.current,
-          signal: signal,
+          signal: abortRef.current.signal,
           url: config!.url,
           model: config!.model,
         })) {
@@ -145,7 +147,7 @@ function App() {
         }
       } catch (error: any) {
         setQueryingModel(false);
-        if (error.message === 'Fetch is aborted') {
+        if (error.name === 'AbortError') {
           const systemMessage: Message = {
             text: 'Message stream aborted',
             sender: Sender.SYSTEM,
