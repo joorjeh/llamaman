@@ -42,6 +42,7 @@ if [ "$1" = "update" ]; then
   rm -rf DEBIAN/
   rm -rf usr/
   dpkg-deb -R ./src-tauri/target/release/bundle/deb/vogelsang*amd64.deb .
+  exit 0
 fi
 
 new_hash=$(md5sum "$HOME/.vogelsang/tools.json" | awk '{print $1}')
