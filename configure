@@ -51,6 +51,7 @@ use std::io::prelude::*;
 use std::fs::OpenOptions;
 use std::io::Write;
 
+#[command]
 fn read_file(filename: &str) -> Result<String, String> {
     let mut file = File::open(filename).map_err(|err| err.to_string()).unwrap();
     let mut contents = String::new();
@@ -58,6 +59,7 @@ fn read_file(filename: &str) -> Result<String, String> {
     Ok(contents)
 }
 
+#[command]
 fn write_file(filename: &str, contents: &str) -> Result<String, String> {
     let mut file = OpenOptions::new()
         .write(true)
