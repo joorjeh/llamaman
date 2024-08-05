@@ -24,7 +24,6 @@ const Configuration = ({
     e.preventDefault();
     if (newConfig.platform === 'aws') {
       const credentials = await getAwsCredentials();
-      console.log("Credentials: ", credentials);
       setClient(getAwsClient(credentials));
     }
     updateUserConfig(newConfig).then(() => {
