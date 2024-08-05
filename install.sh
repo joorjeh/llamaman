@@ -8,7 +8,7 @@ if ! bash ./load_tools.sh; then
 fi
 
 hash=$(md5sum "$HOME/.vogelsang/tools.json" | awk '{print $1}')
-echo "$hash" >"$HOME/.vogelsang/.tools_hash"
+echo "$hash" >"$HOME/.local/vogelsang/.tools_hash"
 
 yarn
 yarn tauri build --bundles deb
@@ -37,7 +37,6 @@ if [ "$1" = "uninstall" ]; then
   echo "Successfully removed vogelsang."
   exit 1
 fi
-
 
 new_hash=$(md5sum "$HOME/.vogelsang/tools.json" | awk '{print $1}')
 if [ -f .tools_hash ]; then
