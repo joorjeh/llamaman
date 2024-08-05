@@ -28,6 +28,7 @@ dist-ssr
 .chat_history
 
 # Env
+.env.production
 .env
 .config.ts
 
