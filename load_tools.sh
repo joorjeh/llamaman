@@ -8,8 +8,6 @@ fi
 input_file="$HOME/.vogelsang/tools.json"
 output_file="$HOME/.local/vogelsang/src/tools.ts"
 
-#!/bin/bash
-
 cat <<EOF >"$output_file"
 import Tool from './types/Tool';
 import { invoke } from '@tauri-apps/api/tauri';
@@ -20,6 +18,7 @@ EOF
 jq -r 'keys[]' "$input_file" | while read -r tool_name; do
   cat <<EOF >>"$output_file"
   $tool_name: {
+    name: "$tool_name",
     toolDefinition: \`$(jq -c ".$tool_name" "$input_file" | sed 's/"/\\"/g')\`,
     description: $(jq -r ".$tool_name.description" "$input_file" | sed 's/^/'"'"'/; s/$/'"'"'/'),
     args: {
@@ -98,4 +97,4 @@ BEGIN {
 # Replace the original output file with the updated content
 mv "$temp_file" "$output_file"
 
-echo "Handler macro updated successfully in $output_file"
+echo "Tools loaded successfully."

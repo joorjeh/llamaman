@@ -77,6 +77,7 @@ function App() {
     setQueryingModel(true);
     setInputMessage('');
     if (message) {
+      console.log("Prompt: ", prompt.current);
       prompt.current += message.text;
       prompt.current += "<|eot_id|><|start_header_id|>assistant<|end_header_id|>";
       setMessages(prevMessages => [...prevMessages, message]);
