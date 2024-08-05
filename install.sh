@@ -21,7 +21,10 @@ cat <<'EOF' >bin/vogelsang
 #!/bin/bash
 
 cd $HOME/.local/vogelsang/
-bash ./load_tools.sh
+if ! bash ./load_tools.sh; then
+  echo "Error: Failed to load tools. Exiting."
+  exit 1
+fi
 
 yarn 
 yarn tauri build
