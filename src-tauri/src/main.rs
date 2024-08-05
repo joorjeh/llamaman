@@ -5,6 +5,18 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 use tauri::{command, State};
 use dirs;
+use toml;
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+struct AwsCredentials {
+    aws_access_key_id: String,
+    aws_secret_access_key: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct AwsConfig {
+    default: AwsCredentials,
+}
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 struct UserConfig {
@@ -35,7 +47,6 @@ fn get_config_path() -> std::path::PathBuf {
     config_dir
 }
 
-// TODO this should fill in missing values with defaults
 fn read_config() -> UserConfig {
     let config_path = get_config_path();
     if config_path.exists() {
@@ -63,20 +74,6 @@ fn write_config(config: &UserConfig) {
 #[command]
 fn get_user_config(state: State<ConfigState>) -> UserConfig {
     state.0.lock().unwrap().clone()
-}
-
-
-use toml;
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-struct AwsCredentials {
-    aws_access_key_id: String,
-    aws_secret_access_key: String,
-}
-
-#[derive(Debug, Deserialize)]
-struct AwsConfig {
-    default: AwsCredentials,
 }
 
 #[command]

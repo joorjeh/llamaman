@@ -60,15 +60,24 @@ mv "$temp_file" "$output_file"
 # Extract function names from the input file
 function_names=$(grep -oP '(?<=fn )\w+(?=\()' "$input_file")
 
+# Extract imports from the input file
+imports=$(grep -P '^use' "$input_file")
+
 # Create a temporary file
 temp_file=$(mktemp)
 
-# Process the output file and update the generate_handler macro
-awk -v functions="$function_names" '
+# Process the output file, update imports and the generate_handler macro
+awk -v imports="$imports" -v functions="$function_names" '
 BEGIN {
     split(functions, func_array, "\n")
     in_macro = 0
-    printed_update_user_config = 0
+    printed_imports = 0
+}
+/\/\/ Tool imports/ {
+    print $0
+    print imports
+    printed_imports = 1
+    next
 }
 /\.invoke_handler\(tauri::generate_handler!\[/ {
     print $0
@@ -88,8 +97,10 @@ BEGIN {
         next
     }
 }
-!/get_aws_credentials,/ && !/get_user_config,/ && !/update_user_config,/ && !in_macro {
-    print $0
+!/^use/ || !printed_imports {
+    if (!/get_aws_credentials,/ && !/get_user_config,/ && !/update_user_config,/ && !in_macro) {
+        print $0
+    }
 }
 ' "$output_file" >"$temp_file"
 
