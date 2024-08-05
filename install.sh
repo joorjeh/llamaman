@@ -35,16 +35,16 @@ if [ "$1" = "uninstall" ]; then
   exit 1
 fi
 
-if ! bash ./load_tools.sh; then
-  echo "Error: Failed to load tools. Exiting."
-  exit 1
-fi
 
 new_hash=$(md5sum "$HOME/.vogelsang/tools.json" | awk '{print $1}')
 if [ -f .tools_hash ]; then
     stored_hash=$(cat .tools_hash)
     if [ "$new_hash" != "$stored_hash" ]; then
         echo "Hash does not match"
+        if ! bash ./load_tools.sh; then
+          echo "Error: Failed to load tools. Exiting."
+          exit 1
+        fi
         yarn
         yarn tauri build --bundles app
         echo "$new_hash" > .tools_hash
