@@ -2,25 +2,14 @@ import { Box, Button, MenuItem, Select, SelectChangeEvent, TextField } from "@mu
 import { getAwsCredentials, updateUserConfig } from "./utils";
 import UserConfig from "./types/UserConfig";
 import { ChangeEvent, useState } from "react";
-import { modelIds } from "./platforms";
+import { getAwsClient, modelIds } from "./platforms";
 import { BedrockRuntimeClient } from "@aws-sdk/client-bedrock-runtime";
-import AwsCredentials from "./types/AwsCredential";
 
 interface ConfigurationProps {
   config: UserConfig | null;
   setConfig: React.Dispatch<React.SetStateAction<UserConfig | null>>;
   setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
   setClient: React.Dispatch<React.SetStateAction<BedrockRuntimeClient | null>>;
-}
-
-const getAwsClient = (credentials: AwsCredentials): BedrockRuntimeClient => {
-  return new BedrockRuntimeClient({
-    region: 'us-west-2',
-    credentials: {
-      accessKeyId: credentials.aws_access_key_id,
-      secretAccessKey: credentials.aws_secret_access_key,
-    },
-  });
 }
 
 const Configuration = ({

@@ -4,16 +4,17 @@ import { Box, TextField, Button, CircularProgress, Modal } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import StopCircleIcon from '@mui/icons-material/StopCircle';
 import { default_tool_system_prompt } from './prompts/default_tool_system_prompt';
-import { getAWSStreamingResponse, getOllamaStreamingResponse } from './platforms';
+import { getAwsClient, getAWSStreamingResponse, getOllamaStreamingResponse } from './platforms';
 import MessageBox from './MessageBox';
 import Message from './types/Message';
 import Sender from './types/Sender';
-import { searchFunctionTags, parseFunctionArgs, getUserConfig } from './utils';
+import { searchFunctionTags, parseFunctionArgs, getUserConfig, getAwsCredentials } from './utils';
 import Tool from './types/Tool';
 import tools from './tools';
 import Configuration from './Configuration';
 import UserConfig from './types/UserConfig';
 import { BedrockRuntimeClient } from '@aws-sdk/client-bedrock-runtime';
+import AwsCredentials from './types/AwsCredential';
 
 const theme = createTheme({
   typography: {
@@ -51,6 +52,12 @@ function App() {
   // Load config on app load
   useEffect(() => {
     getUserConfig().then((config) => {
+      if (config.platform === 'aws') {
+        getAwsCredentials()
+          .then((credentials: AwsCredentials) => {
+            setClient(getAwsClient(credentials));
+          });
+      }
       setConfig(config);
       setLoading(false);
     });

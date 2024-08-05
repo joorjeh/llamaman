@@ -1,7 +1,19 @@
 import {
+  BedrockRuntimeClient,
   InvokeModelWithResponseStreamCommand
 } from '@aws-sdk/client-bedrock-runtime';
 import StreamingArgs from './types/StreamingArgs.ts';
+import AwsCredentials from './types/AwsCredential.ts';
+
+export const getAwsClient = (credentials: AwsCredentials): BedrockRuntimeClient => {
+  return new BedrockRuntimeClient({
+    region: 'us-west-2',
+    credentials: {
+      accessKeyId: credentials.aws_access_key_id,
+      secretAccessKey: credentials.aws_secret_access_key,
+    },
+  });
+}
 
 export async function* getOllamaStreamingResponse({
   prompt,
