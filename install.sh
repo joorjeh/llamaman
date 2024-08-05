@@ -56,6 +56,8 @@ else
     yarn tauri build --bundles deb
 fi
 
+rm -rf DEBIAN/
+rm -rf usr/
 dpkg-deb -R ./src-tauri/target/release/bundle/deb/vogelsang*amd64.deb .
 ./usr/bin/vogelsang
 
