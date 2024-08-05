@@ -6,7 +6,7 @@
     "distDir": "../dist"
   },
   "package": {
-    "productName": "vogelsang",
+    "productName": "llamaman",
     "version": "0.1.0"
   },
   "tauri": {
@@ -21,7 +21,7 @@
     },
     "windows": [
       {
-        "title": "vogelsang",
+        "title": "LlamaMan",
         "width": 800,
         "height": 900
       }
@@ -32,7 +32,7 @@
     "bundle": {
       "active": true,
       "targets": "all",
-      "identifier": "com.vogelsang",
+      "identifier": "com.llamaman",
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",
