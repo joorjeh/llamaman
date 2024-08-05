@@ -21,6 +21,16 @@ cat <<'EOF' >bin/vogelsang
 #!/bin/bash
 
 cd $HOME/.local/vogelsang/
+
+if [ "$1" = "uninstall" ]; then
+  echo "Uninstalling..."
+  [ -d "$HOME/.local/vogelsang" ] && rm -r "$HOME/.local/vogelsang"
+  [ -d "$HOME/.vogelsang" ] && rm -r "$HOME/.vogelsang"
+  [ -f "$HOME/.local/share/applications/vogelsang.desktop" ] && rm "$HOME/.local/share/applications/vogelsang.desktop"
+  echo "Successfully removed vogelsang."
+  exit 1
+fi
+
 if ! bash ./load_tools.sh; then
   echo "Error: Failed to load tools. Exiting."
   exit 1
@@ -40,15 +50,15 @@ echo 'export PATH=$PATH:$HOME/.local/vogelsang/bin' >>$HOME/.bashrc
 # Reload .bashrc
 source $HOME/.bashrc
 
-# Create desktop file
-cat <<EOF >$HOME/.local/share/applications/vogelsang.desktop
-[Desktop Entry]
-Name=Vogelsang
-Exec=$HOME/.local/vogelsang/bin/vogelsang
-Icon=$HOME/.local/vogelsang/src-tauri/icons/128x128.png
-Type=Application
-Categories=Utility;
-EOF
+# # Create desktop file
+# cat <<EOF >$HOME/.local/share/applications/vogelsang.desktop
+# [Desktop Entry]
+# Name=Vogelsang
+# Exec=$HOME/.local/vogelsang/bin/vogelsang
+# Icon=$HOME/.local/vogelsang/src-tauri/icons/128x128.png
+# Type=Application
+# Categories=Utility;
+# EOF
 
-# Make the desktop file executable
-chmod +x $HOME/.local/share/applications/vogelsang.desktop
+# # Make the desktop file executable
+# chmod +x $HOME/.local/share/applications/vogelsang.desktop
