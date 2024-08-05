@@ -42,5 +42,6 @@ coverage/
 bin/
 usr/
 DEBIAN/
+.tools_hash
 
 TODO
