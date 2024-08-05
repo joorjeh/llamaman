@@ -35,7 +35,7 @@ function App() {
   const [isLoading, setLoading] = useState<boolean>(true);
   const [queryingModel, setQueryingModel] = useState<boolean>(false);
   const [abortDisabled, setAbortDisabled] = useState<boolean>(true);
-  const abortRef = useRef<AbortController | AwsAbortController | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
   const steps = useRef<number>(0);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const messagesEndRef = useRef<any>(null); // TODO determine correct type
