@@ -48,27 +48,25 @@ if [ ! -f "$HOME/.llamaman/tools.rs" ]; then
   cat <<EOF >"$HOME/.llamaman/tools.rs"
 use std::fs::File;
 use std::io::prelude::*;
-use std::io::Result;
 use std::fs::OpenOptions;
-use std::io::{Write, Result};
+use std::io::Write;
 
-#[command]
-fn read_file_contents(filename: &str) -> Result<String> {
-    let mut file = File::open(filename)?;
+fn read_file(filename: &str) -> Result<String, String> {
+    let mut file = File::open(filename).map_err(|err| err.to_string()).unwrap();
     let mut contents = String::new();
-    file.read_to_string(&mut contents)?;
+    file.read_to_string(&mut contents).map_err(|err| err.to_string()).unwrap();
     Ok(contents)
 }
 
-#[command]
-fn write_file(filename: &str, contents: &str) -> Result<()> {
+fn write_file(filename: &str, contents: &str) -> Result<String, String> {
     let mut file = OpenOptions::new()
         .write(true)
         .create(true)
         .truncate(true)
-        .open(filename)?;
-    file.write_all(contents.as_bytes())?;
-    Ok(())
+        .open(filename).map_err(|err| err.to_string()).unwrap();
+    file.write_all(contents.as_bytes())
+        .map_err(|e| e.to_string()).unwrap();
+    Ok(format!("Contents were written to file {}.", filename))
 }
 EOF
 fi
