@@ -6,7 +6,7 @@ if ! bash ./load_tools.sh; then
 fi
 
 yarn
-yarn tauri build --bundles app
+yarn tauri build --target appimage
 
 if [ ! -d "bin" ]; then
   mkdir bin
@@ -49,7 +49,7 @@ else
     echo "File .tools_hash does not exist"
     echo "$new_hash" > .tools_hash
     yarn
-    yarn tauri build --bundles app
+    yarn tauri build --target appimage
 fi
 
 ./src-tauri/target/release/bundle/appimage/vogelsang_*.AppImage
