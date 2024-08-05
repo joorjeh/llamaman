@@ -5,8 +5,8 @@ if ! command -v jq &>/dev/null; then
   exit 1
 fi
 
-input_file="$HOME/.vogelsang/tools.json"
-output_file="$HOME/.local/vogelsang/src/tools.ts"
+input_file="$HOME/.llamaman/tools.json"
+output_file="$HOME/.local/llamaman/src/tools.ts"
 
 cat <<EOF >"$output_file"
 import Tool from './types/Tool';
@@ -43,8 +43,8 @@ EOF
 
 # Load Rust fns and add names to generate_handler macro
 
-input_file="$HOME/.vogelsang/tools.rs"
-output_file="$HOME/.local/vogelsang/src-tauri/src/main.rs"
+input_file="$HOME/.llamaman/tools.rs"
+output_file="$HOME/.local/llamaman/src-tauri/src/main.rs"
 
 temp_file=$(mktemp)
 
