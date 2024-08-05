@@ -24,9 +24,9 @@ cd $HOME/.local/vogelsang/
 
 if [ "$1" = "uninstall" ]; then
   echo "Uninstalling..."
-  [ -d "$HOME/.local/vogelsang" ] && rm -r "$HOME/.local/vogelsang"
-  [ -d "$HOME/.vogelsang" ] && rm -r "$HOME/.vogelsang"
-  [ -f "$HOME/.local/share/applications/vogelsang.desktop" ] && rm "$HOME/.local/share/applications/vogelsang.desktop"
+  [ -d "$HOME/.local/vogelsang" ] && rm -rf "$HOME/.local/vogelsang"
+  [ -d "$HOME/.vogelsang" ] && rm -rf "$HOME/.vogelsang"
+  [ -f "$HOME/.local/share/applications/vogelsang.desktop" ] && rm -f "$HOME/.local/share/applications/vogelsang.desktop"
   echo "Successfully removed vogelsang."
   exit 1
 fi
