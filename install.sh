@@ -7,6 +7,9 @@ if ! bash ./load_tools.sh; then
   exit 1
 fi
 
+hash=$(md5sum "$HOME/.vogelsang/tools.json" | awk '{print $1}')
+echo "$hash" >"$HOME/.vogelsang/.tools_hash"
+
 yarn
 yarn tauri build --bundles deb
 
