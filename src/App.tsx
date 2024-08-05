@@ -15,7 +15,6 @@ import Configuration from './Configuration';
 import UserConfig from './types/UserConfig';
 import { BedrockRuntimeClient } from '@aws-sdk/client-bedrock-runtime';
 import AwsCredentials from './types/AwsCredential';
-import { AbortController as AwsAbortController } from '@aws-sdk/abort-controller';
 
 const theme = createTheme({
   typography: {
@@ -87,9 +86,7 @@ function App() {
       try {
         setMessages(prevMessages => [...prevMessages, { text: '', sender: Sender.AI }]);
 
-        const abortController = (config!.platform === 'aws') ?
-          new AwsAbortController() :
-          new AbortController();
+        const abortController = new AbortController();
         abortRef.current = abortController;
         setAbortDisabled(false);
         let aiResponse: string = "";
