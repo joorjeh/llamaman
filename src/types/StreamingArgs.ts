@@ -1,5 +1,7 @@
+import { BedrockRuntimeClient } from "@aws-sdk/client-bedrock-runtime";
+
 export default interface StreamingArgs {
-  client?: any;
+  client?: BedrockRuntimeClient;
   prompt: string;
   model?: string;
   url?: string;

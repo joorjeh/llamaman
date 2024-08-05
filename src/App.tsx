@@ -145,7 +145,7 @@ function App() {
         }
       } catch (error: any) {
         setQueryingModel(false);
-        if (error.name === 'AbortError') {
+        if (error.message === 'Fetch is aborted') {
           const systemMessage: Message = {
             text: 'Message stream aborted',
             sender: Sender.SYSTEM,

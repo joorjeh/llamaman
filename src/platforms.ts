@@ -83,7 +83,7 @@ export async function* getAWSStreamingResponse({
     }),
   });
 
-  const responseStream = await client.send(command, { abortSignal: signal });
+  const responseStream = await client!.send(command, { abortSignal: signal });
 
   if (responseStream.body) {
     for await (const event of responseStream.body) {
