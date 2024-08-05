@@ -39,3 +39,16 @@ echo 'export PATH=$PATH:$HOME/.local/vogelsang/bin' >>$HOME/.bashrc
 
 # Reload .bashrc
 source $HOME/.bashrc
+
+# Create desktop file
+cat <<EOF >$HOME/.local/share/applications/vogelsang.desktop
+[Desktop Entry]
+Name=Vogelsang
+Exec=$HOME/.local/vogelsang/bin/vogelsang
+Icon=$HOME/.local/vogelsang/src-tauri/icons/128x128.png
+Type=Application
+Categories=Utility;
+EOF
+
+# Make the desktop file executable
+chmod +x $HOME/.local/share/applications/vogelsang.desktop
