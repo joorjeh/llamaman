@@ -6,7 +6,7 @@ if ! bash ./load_tools.sh; then
 fi
 
 yarn
-yarn tauri build
+yarn tauri build --bundles app
 
 if [ ! -d "bin" ]; then
   mkdir bin
@@ -36,8 +36,21 @@ if ! bash ./load_tools.sh; then
   exit 1
 fi
 
-yarn 
-yarn tauri build
+new_hash=$(md5sum "$HOME/.vogelsang/tools.json" | awk '{print $1}')
+if [ -f .tools_hash ]; then
+    stored_hash=$(cat .tools_hash)
+    if [ "$new_hash" != "$stored_hash" ]; then
+        echo "Hash does not match"
+        yarn
+        yarn tauri build --bundles app
+        echo "$new_hash" > .tools_hash
+    fi
+else
+    echo "File .tools_hash does not exist"
+    echo "$new_hash" > .tools_hash
+    yarn
+    yarn tauri build --bundles app
+fi
 
 ./src-tauri/target/release/bundle/appimage/vogelsang_*.AppImage
 
