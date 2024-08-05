@@ -92,7 +92,7 @@ function App() {
         setAbortDisabled(false);
         let aiResponse: string = "";
         for await (const chunk of config!.platform === 'aws' ? getAWSStreamingResponse({
-          client: client,
+          client: client!,
           prompt: prompt.current,
           signal: signal,
           model: config!.model,
