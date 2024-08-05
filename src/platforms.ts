@@ -1,16 +1,7 @@
 import {
-  BedrockRuntimeClient,
   InvokeModelWithResponseStreamCommand
 } from '@aws-sdk/client-bedrock-runtime';
 import StreamingArgs from './types/StreamingArgs.ts';
-
-const client = new BedrockRuntimeClient({
-  region: 'us-west-2',
-  credentials: {
-    accessKeyId: import.meta.env.VITE_ACCESS_KEY_ID,
-    secretAccessKey: import.meta.env.VITE_SECRET_ACCESS_KEY,
-  },
-});
 
 export async function* getOllamaStreamingResponse({
   prompt,
@@ -63,6 +54,7 @@ export async function* getOllamaStreamingResponse({
 };
 
 export async function* getAWSStreamingResponse({
+  client,
   prompt,
   signal,
   model = 'meta.llama3-1-405b-instruct-v1:0',

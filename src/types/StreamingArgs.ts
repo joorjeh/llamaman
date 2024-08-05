@@ -1,4 +1,5 @@
 export default interface StreamingArgs {
+  client?: any;
   prompt: string;
   model?: string;
   url?: string;

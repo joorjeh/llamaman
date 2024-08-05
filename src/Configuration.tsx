@@ -3,22 +3,41 @@ import { getAwsCredentials, updateUserConfig } from "./utils";
 import UserConfig from "./types/UserConfig";
 import { ChangeEvent, useState } from "react";
 import { modelIds } from "./platforms";
+import { BedrockRuntimeClient } from "@aws-sdk/client-bedrock-runtime";
+import AwsCredentials from "./types/AwsCredential";
 
 interface ConfigurationProps {
   config: UserConfig | null;
   setConfig: React.Dispatch<React.SetStateAction<UserConfig | null>>;
   setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setClient: React.Dispatch<React.SetStateAction<BedrockRuntimeClient | null>>;
+}
+
+const getAwsClient = (credentials: AwsCredentials): BedrockRuntimeClient => {
+  return new BedrockRuntimeClient({
+    region: 'us-west-2',
+    credentials: {
+      accessKeyId: credentials.aws_access_key_id,
+      secretAccessKey: credentials.aws_secret_access_key,
+    },
+  });
 }
 
 const Configuration = ({
   config,
   setConfig,
   setOpenModal,
+  setClient,
 }: ConfigurationProps) => {
   const [newConfig, setNewConfig] = useState<UserConfig>(config!);
 
-  const handleConfigUpdate = (e: any) => {
+  const handleConfigUpdate = async (e: any) => {
     e.preventDefault();
+    if (newConfig.platform === 'aws') {
+      const credentials = await getAwsCredentials();
+      console.log("Credentials: ", credentials);
+      setClient(getAwsClient(credentials));
+    }
     updateUserConfig(newConfig).then(() => {
       setConfig(newConfig);
       setOpenModal(false);
@@ -54,17 +73,13 @@ const Configuration = ({
           <Select
             value={newConfig.platform}
             onChange={(e: SelectChangeEvent) => {
-              if (e.target.value === 'aws') {
-                getAwsCredentials().then();
-              } else {
-                setNewConfig(prevConfig => {
-                  return {
-                    ...prevConfig,
-                    platform: e.target.value as string,
-                    model: modelIds[e.target.value as string][0],
-                  }
-                })
-              }
+              setNewConfig(prevConfig => {
+                return {
+                  ...prevConfig,
+                  platform: e.target.value as string,
+                  model: modelIds[e.target.value as string][0],
+                }
+              });
             }}
           >
             <MenuItem value="aws">AWS</MenuItem>

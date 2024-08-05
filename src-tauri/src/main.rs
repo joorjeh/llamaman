@@ -5,8 +5,6 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 use tauri::{command, State};
 use dirs;
-use std::path::PathBuf;
-use toml::Value;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 struct UserConfig {
@@ -14,7 +12,6 @@ struct UserConfig {
     url: String,
     model: String,
 }
-
 
 impl Default for UserConfig {
     fn default() -> Self {

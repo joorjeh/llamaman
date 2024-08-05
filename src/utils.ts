@@ -1,5 +1,6 @@
 import { invoke } from "@tauri-apps/api/tauri";
 import UserConfig from "./types/UserConfig";
+import AwsCredentials from "./types/AwsCredential";
 
 export function searchFunctionTags(input: string): { name: string; args: any } | null {
   const regex = /<function=(\w+)>(.*?)<\/function>/g;
@@ -45,11 +46,6 @@ export async function getUserConfig(): Promise<UserConfig> {
 
 export async function updateUserConfig(newConfig: UserConfig): Promise<void> {
   await invoke('update_user_config', { newConfig });
-}
-
-interface AwsCredentials {
-  aws_access_key_id: string;
-  aws_secret_access_key: string;
 }
 
 export async function getAwsCredentials(): Promise<AwsCredentials> {

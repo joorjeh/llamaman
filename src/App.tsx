@@ -13,6 +13,7 @@ import Tool from './types/Tool';
 import tools from './tools';
 import Configuration from './Configuration';
 import UserConfig from './types/UserConfig';
+import { BedrockRuntimeClient } from '@aws-sdk/client-bedrock-runtime';
 
 const theme = createTheme({
   typography: {
@@ -41,6 +42,7 @@ function App() {
   const [inputMessage, setInputMessage] = useState<string>('');
   const [config, setConfig] = useState<UserConfig | null>(null);
   const prompt = useRef<string>(default_tool_system_prompt);
+  const [client, setClient] = useState<BedrockRuntimeClient | null>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -82,7 +84,9 @@ function App() {
         const signal = controller.signal;
         setAbortDisabled(false);
         let aiResponse: string = "";
+        console.log("client: ", client);
         for await (const chunk of config!.platform === 'aws' ? getAWSStreamingResponse({
+          client: client,
           prompt: prompt.current,
           signal: signal,
           model: config!.model,
@@ -270,6 +274,7 @@ function App() {
       >
         <Box>
           <Configuration
+            setClient={setClient}
             config={config}
             setConfig={setConfig}
             setOpenModal={setOpenModal}
