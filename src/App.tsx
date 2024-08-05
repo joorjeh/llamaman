@@ -91,7 +91,6 @@ function App() {
         const signal = controller.signal;
         setAbortDisabled(false);
         let aiResponse: string = "";
-        console.log("client: ", client);
         for await (const chunk of config!.platform === 'aws' ? getAWSStreamingResponse({
           client: client,
           prompt: prompt.current,
