@@ -1,18 +1,14 @@
 #!/bin/bash
 
+# TODO add help command or vogelsang
+
 cd $HOME/.local/vogelsang/
 
-if ! bash ./load_tools.sh; then
-  echo "Error: Failed to load tools. Exiting."
-  exit 1
-fi
-
+bash ./load_tools.sh
 hash=$(md5sum "$HOME/.vogelsang/tools.json" | awk '{print $1}')
 echo "$hash" >"$HOME/.local/vogelsang/.tools_hash"
-
 yarn
 yarn tauri build --bundles deb
-
 dpkg-deb -R ./src-tauri/target/release/bundle/deb/vogelsang*amd64.deb .
 
 if [ ! -d "bin" ]; then
@@ -36,6 +32,16 @@ if [ "$1" = "uninstall" ]; then
   [ -f "$HOME/.local/share/applications/vogelsang.desktop" ] && rm -f "$HOME/.local/share/applications/vogelsang.desktop"
   echo "Successfully removed vogelsang."
   exit 1
+fi
+
+if [ "$1" = "update" ]; then
+  echo "Updating..."
+  git pull
+  yarn
+  yarn tauri build --bundles deb
+  rm -rf DEBIAN/
+  rm -rf usr/
+  dpkg-deb -R ./src-tauri/target/release/bundle/deb/vogelsang*amd64.deb .
 fi
 
 new_hash=$(md5sum "$HOME/.vogelsang/tools.json" | awk '{print $1}')
