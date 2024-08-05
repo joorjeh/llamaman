@@ -1,5 +1,4 @@
 interface Tool {
-  name: string;
   toolDefinition: string;
   description: string;
   args: Record<string, string>;

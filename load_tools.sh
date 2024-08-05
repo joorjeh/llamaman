@@ -18,8 +18,7 @@ EOF
 jq -r 'keys[]' "$input_file" | while read -r tool_name; do
   cat <<EOF >>"$output_file"
   $tool_name: {
-    name: "$tool_name",
-    toolDefinition: \`$(jq -c ".$tool_name" "$input_file" | sed 's/"/\\"/g')\`,
+    toolDefinition: \`$(jq -c ".$tool_name + {\"name\": \"$tool_name\"}" "$input_file" | sed 's/"/\\"/g')\`,
     description: $(jq -r ".$tool_name.description" "$input_file" | sed 's/^/'"'"'/; s/$/'"'"'/'),
     args: {
 EOF
