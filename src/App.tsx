@@ -14,6 +14,7 @@ import { BedrockRuntimeClient } from '@aws-sdk/client-bedrock-runtime';
 import AwsCredentials from './types/AwsCredential';
 import FuncDescription from './types/FuncDescription';
 import InputBar from './InputBar';
+import Messages from './Messages';
 
 function App() {
   const [isLoading, setLoading] = useState<boolean>(true);
@@ -175,21 +176,7 @@ function App() {
             boxSizing: 'border-box',
             overflow: 'hidden',
           }}>
-            <Box
-              sx={{
-                flexGrow: 1,
-                overflowY: 'auto',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '10px',
-              }}>
-              {
-                messages.map((message, index) => (
-                  <MessageBox key={index} message={message} index={index} />
-                ))
-              }
-              <div ref={messagesEndRef} />
-            </Box>
+            <Messages messages={messages} messagesEndRef={messagesEndRef} />
             <InputBar 
               handleSendMessage={handleSendMessage}
               queryingModel={queryingModel}
