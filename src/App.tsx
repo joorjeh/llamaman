@@ -14,11 +14,15 @@ import AwsCredentials from './types/AwsCredential';
 import FuncDescription from './types/FuncDescription';
 import InputBar from './InputBar';
 import Messages from './Messages';
+import NotificationComponent from './NotificationComponent';
+import Notification from './types/Notification';
 
 function App() {
   const [isLoading, setLoading] = useState<boolean>(true);
   const [queryingModel, setQueryingModel] = useState<boolean>(false);
   const [abortDisabled, setAbortDisabled] = useState<boolean>(true);
+  const [displayNotification, setDisplayNotification] = useState<boolean>(false);
+  const [notification, setNotification] = useState<Notification>({ severity: 'info', message: '' });
   const abortRef = useRef<AbortController | null>(null);
   const steps = useRef<number>(0);
   const [openModal, setOpenModal] = useState<boolean>(false);
@@ -27,6 +31,14 @@ function App() {
   const [config, setConfig] = useState<UserConfig | null>(null);
   const prompt = useRef<string>(default_tool_system_prompt);
   const [client, setClient] = useState<BedrockRuntimeClient | null>(null);
+
+  const setTimedNotification = (notification: Notification) => {
+    setNotification(notification);
+    setDisplayNotification(true);
+    setTimeout(() => {
+      setDisplayNotification(false);
+    }, 3000);
+  }
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -202,9 +214,11 @@ function App() {
             config={config}
             setConfig={setConfig}
             setOpenModal={setOpenModal}
+            setTimedNotification={setTimedNotification}
           />
         </Box>
       </Modal>
+      {displayNotification && <NotificationComponent notification={notification} />}
     </>
   );
 }
