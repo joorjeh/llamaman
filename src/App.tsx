@@ -97,7 +97,7 @@ function App() {
         if (funcDescription) {
           setMessages(prevMessages => prevMessages.slice(0, -1));
           // TODO setup config to make max_steps
-          if (steps.current < 10) {
+          if (steps.current < config!.max_steps) {
             const tool: Tool = tools[funcDescription.name]
             const parsedArgs: Record<string, string | number | boolean> = parseFunctionArgs(funcDescription.parameters, tool.args);
 

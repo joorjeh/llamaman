@@ -24,6 +24,7 @@ struct UserConfig {
     url: String,
     model: String,
     temperature: f32,
+    max_steps: u8,
 }
 
 impl Default for UserConfig {
@@ -33,6 +34,7 @@ impl Default for UserConfig {
             url: "http://localhost:11434/api/generate".to_string(),
             model: "llama3.1".to_string(),
             temperature: 0.0,
+            max_steps: 10,
         }
     }
 }

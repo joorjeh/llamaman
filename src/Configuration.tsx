@@ -112,6 +112,23 @@ const Configuration = ({
             </MenuItem>
           ))}
         </Select>
+        <Box sx={{ gridArea: 'maxSteps' }}>URL</Box>
+        <TextField
+          sx={{ gridArea: 'maxStepsInput' }}
+          name="maxSteps"
+          variant="outlined"
+          value={newConfig.max_steps}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+            let new_max_steps = parseInt(e.target.value);
+            setNewConfig(prevConfig => {
+              return {
+                ...prevConfig,
+                max_steps: new_max_steps,
+              }
+            })
+          }}
+        />
+
         <Box sx={{ gridArea: 'temperature' }}>Temperature</Box>
         <TextField
           sx={{ gridArea: 'temperatureInput' }}

@@ -10,6 +10,7 @@ platform = "ollama"
 url = "http://localhost:11434/api/generate"
 model = "llama3.1"
 temperature = 0.0
+max_steps = 10
 EOF
 fi
 
