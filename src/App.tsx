@@ -32,7 +32,6 @@ function App() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Load config on app load
   useEffect(() => {
     getUserConfig().then((config) => {
       if (config.platform === 'aws') {

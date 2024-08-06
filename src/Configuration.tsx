@@ -121,7 +121,7 @@ const Configuration = ({
           value={newConfig.temperature}
           onChange={(e: ChangeEvent<HTMLInputElement>) => {
             // TODO add error for when temperature is not a number
-            let new_temperature = Number(e.target.value);
+            let new_temperature = parseFloat(Number(e.target.value).toFixed(2));
             setNewConfig(prevConfig => {
               return {
                 ...prevConfig,
