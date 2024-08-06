@@ -228,6 +228,7 @@ function App() {
           vertical: 'bottom',
           horizontal: 'center',
         }}
+        onClose={() => setSnackbarOpen(false)}
         message={snackbarMessage}
       />
     </>
