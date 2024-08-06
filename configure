@@ -66,7 +66,7 @@ fn read_file(filename: &str) -> Result<String, String> {
 }
 
 #[command]
-fn write_file(filename: &str, contents: &str) -> Result<String, String> {
+fn write_file(filename: &str, content: &str) -> Result<String, String> {
     let mut path = PathBuf::new();
     path.push(dirs::home_dir().ok_or_else(|| "Unable to get home directory".to_string())?);
     path.push(".llamaman");
