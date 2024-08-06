@@ -23,6 +23,7 @@ struct UserConfig {
     platform: String,
     url: String,
     model: String,
+    temperature: f32,
 }
 
 impl Default for UserConfig {
@@ -31,6 +32,7 @@ impl Default for UserConfig {
             platform: "ollama".to_string(),
             url: "http://localhost:11434/api/generate".to_string(),
             model: "llama3.1".to_string(),
+            temperature: 0.0,
         }
     }
 }
@@ -39,7 +41,7 @@ struct ConfigState(std::sync::Mutex<UserConfig>);
 
 fn get_config_path() -> std::path::PathBuf {
     let mut config_dir = dirs::home_dir().expect("Failed to get home directory");
-    config_dir.push(".vogelsang");
+    config_dir.push(".llamaman");
     if !config_dir.exists() {
         fs::create_dir_all(&config_dir).expect("Failed to create config directory");
     }

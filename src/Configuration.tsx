@@ -53,6 +53,7 @@ const Configuration = ({
       "platform platformSelect"
       "url urlInput"
       "model modelInput"
+      "temperature temperatureInput"
       "save save"`,
         gridTemplateColumns: 'auto 1fr',
       }}>
@@ -111,6 +112,25 @@ const Configuration = ({
             </MenuItem>
           ))}
         </Select>
+        <Box sx={{ gridArea: 'temperature' }}>Temperature</Box>
+        <TextField
+          sx={{ gridArea: 'temperatureInput' }}
+          name="temperature"
+          type="number"
+          variant="outlined"
+          value={newConfig.temperature}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+            // TODO add error for when temperature is not a number
+            let new_temperature = Number(e.target.value);
+            setNewConfig(prevConfig => {
+              return {
+                ...prevConfig,
+                temperature: new_temperature,
+              }
+            })
+          }}
+        />
+
         <Button
           sx={{
             gridArea: 'save',

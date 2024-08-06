@@ -52,6 +52,7 @@ function App() {
   // Load config on app load
   useEffect(() => {
     getUserConfig().then((config) => {
+      console.log(config);
       if (config.platform === 'aws') {
         getAwsCredentials()
           .then((credentials: AwsCredentials) => {
