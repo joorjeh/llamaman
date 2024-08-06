@@ -77,7 +77,6 @@ function App() {
     setQueryingModel(true);
     setInputMessage('');
     if (message) {
-      console.log("Prompt: ", prompt.current);
       prompt.current += message.text;
       prompt.current += "<|eot_id|><|start_header_id|>assistant<|end_header_id|>";
       setMessages(prevMessages => [...prevMessages, message]);
@@ -161,6 +160,12 @@ function App() {
             console.error(`Function ${funcDescription!.name} not found`);
           }
         } else {
+          prompt.current += "<|eot_id|><|start_header_id|>system<|end_header_id|>";
+          const systemMessage: Message = {
+            text: `Function ${funcDescription!.name} returned error ${error}`,
+            sender: Sender.SYSTEM,
+          }
+          await handleSendMessage(systemMessage);
           console.error("Error: ", error.toString())
         }
       }
