@@ -118,38 +118,35 @@ const Configuration = ({
         <TextField
           sx={{ gridArea: 'maxStepsInput' }}
           name="maxSteps"
+          type="number"
           variant="outlined"
           value={newConfig.max_steps}
+          inputProps={{ min: 1 }}
           onChange={(e: ChangeEvent<HTMLInputElement>) => {
-            let new_max_steps = parseInt(e.target.value);
-            if (new_max_steps && new_max_steps > 0) {
-              setNewConfig(prevConfig => {
-                return {
-                  ...prevConfig,
-                  max_steps: new_max_steps,
-                }
-              })
-            } else {
-              alert("Max steps must be a positive whole number")
-            }
+            let new_max_steps = Math.max(0, parseInt(e.target.value));
+            setNewConfig(prevConfig => ({
+              ...prevConfig,
+              max_steps: new_max_steps,
+            }));
           }}
         />
         <Box sx={{ gridArea: 'temperature' }}>Temperature</Box>
         <TextField
           sx={{ gridArea: 'temperatureInput' }}
           name="temperature"
-          type="number"
           variant="outlined"
           value={newConfig.temperature}
+          type="number"
+          inputProps={{ min: "0", step: "0.1" }}
           onChange={(e: ChangeEvent<HTMLInputElement>) => {
-            // TODO add error for when temperature is not a number
-            let new_temperature = parseFloat(Number(e.target.value).toFixed(2));
-            setNewConfig(prevConfig => {
-              return {
+            const value = e.target.value;
+            let new_temperature = Math.max(0, parseFloat(value));
+            if (!isNaN(new_temperature)) {
+              setNewConfig(prevConfig => ({
                 ...prevConfig,
-                temperature: new_temperature,
-              }
-            })
+                temperature: Number(new_temperature.toFixed(2)),
+              }));
+            }
           }}
         />
 
