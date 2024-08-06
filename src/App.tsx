@@ -112,7 +112,9 @@ function App() {
 
         prompt.current += aiResponse;
         funcDescription = searchFunctionTags(aiResponse);
+
         if (funcDescription) {
+          console.log("Func description: ", funcDescription);
           setMessages(prevMessages => prevMessages.slice(0, -1));
           // TODO setup config to make max_steps
           if (steps.current < 10) {

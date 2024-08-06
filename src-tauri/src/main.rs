@@ -132,7 +132,7 @@ fn read_file(filename: &str) -> Result<String, String> {
 }
 
 #[command]
-fn write_file(filename: &str, contents: &str) -> Result<String, String> {
+fn write_file(filename: &str, content: &str) -> Result<String, String> {
     let mut path = PathBuf::new();
     path.push(dirs::home_dir().ok_or_else(|| "Unable to get home directory".to_string())?);
     path.push(".llamaman");
@@ -145,7 +145,7 @@ fn write_file(filename: &str, contents: &str) -> Result<String, String> {
         .open(path)
         .map_err(|e| e.to_string())?;
     
-    file.write_all(contents.as_bytes())
+    file.write_all(content.as_bytes())
         .map_err(|e| e.to_string())?;
     
     Ok(format!("Contents were written to file {}.", filename))

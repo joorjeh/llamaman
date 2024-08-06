@@ -28,8 +28,12 @@ EOF
   cat <<EOF >>"$output_file"
     },
     f: async ({ $(jq -r ".$tool_name.parameters | keys | join(\", \")" "$input_file") }: { $(jq -r ".$tool_name.parameters | to_entries[] | \"\(.key): \(.value.param_type)\"" "$input_file" | paste -sd ", " -) }): Promise<string> => {
-      const response: string = await invoke('${tool_name}', { $(jq -r ".$tool_name.parameters | keys | join(\", \")" "$input_file") });
-      return response;
+      try {
+        const response: string = await invoke('${tool_name}', { $(jq -r ".$tool_name.parameters | keys | join(\", \")" "$input_file") });
+        return response;
+      } catch (error) {
+        return String(error);
+      }
     }
   },
 EOF
