@@ -24,7 +24,7 @@ function App() {
   const abortRef = useRef<AbortController | null>(null);
   const steps = useRef<number>(0);
   const [openModal, setOpenModal] = useState<boolean>(false);
-  const messagesEndRef = useRef<any>(null); // TODO determine correct type
+  const messagesEndRef = useRef<any>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [config, setConfig] = useState<UserConfig | null>(null);
   const prompt = useRef<string>(default_tool_system_prompt);
@@ -111,7 +111,6 @@ function App() {
 
         if (funcDescription) {
           setMessages(prevMessages => prevMessages.slice(0, -1));
-          // TODO setup config to make max_steps
           if (steps.current < config!.max_steps) {
             const tool: Tool = tools[funcDescription.name]
             const parsedArgs: Record<string, string | number | boolean> = parseFunctionArgs(funcDescription.parameters, tool.args);
