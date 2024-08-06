@@ -5,7 +5,7 @@ import FuncDescription from "./types/FuncDescription";
 
 export function searchFunctionTags(input: string): FuncDescription | null {
   const regex = /<function=(\w+)>(.*?)<\/function>/g;
-  const results: { name: string; args: any }[] = [];
+  const results: { name: string; parameters: any }[] = [];
 
   let match;
   while ((match = regex.exec(input)) !== null) {
@@ -13,7 +13,7 @@ export function searchFunctionTags(input: string): FuncDescription | null {
     const functionArgs = JSON.parse(match[2]);
     results.push({
       name: functionName,
-      args: functionArgs,
+      parameters: functionArgs,
     });
   }
 

@@ -2,12 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 import { Box, CircularProgress, Modal } from '@mui/material';
 import { default_tool_system_prompt } from './prompts/default_tool_system_prompt';
 import { getAwsClient, getAWSStreamingResponse, getOllamaStreamingResponse } from './platforms';
-import MessageBox from './MessageBox';
 import Message from './types/Message';
 import Sender from './types/Sender';
 import { parseFunctionArgs, getUserConfig, getAwsCredentials, findJsonObject } from './utils';
 import Tool from './types/Tool';
-import tools from './tools';
 import Configuration from './Configuration';
 import UserConfig from './types/UserConfig';
 import { BedrockRuntimeClient } from '@aws-sdk/client-bedrock-runtime';
@@ -177,7 +175,7 @@ function App() {
             overflow: 'hidden',
           }}>
             <Messages messages={messages} messagesEndRef={messagesEndRef} />
-            <InputBar 
+            <InputBar
               handleSendMessage={handleSendMessage}
               queryingModel={queryingModel}
               clearChat={clearChat}
