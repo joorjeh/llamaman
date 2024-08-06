@@ -1,8 +1,9 @@
 import { invoke } from "@tauri-apps/api/tauri";
 import UserConfig from "./types/UserConfig";
 import AwsCredentials from "./types/AwsCredential";
+import FuncDescription from "./types/FuncDescription";
 
-export function searchFunctionTags(input: string): { name: string; args: any } | null {
+export function searchFunctionTags(input: string): FuncDescription | null {
   const regex = /<function=(\w+)>(.*?)<\/function>/g;
   const results: { name: string; args: any }[] = [];
 
@@ -19,6 +20,17 @@ export function searchFunctionTags(input: string): { name: string; args: any } |
   // NOTE we assume that there is only one function returned by each response,
   // as specified in the system prompt
   return results[0] || null;
+}
+
+export function findJsonObject(input: string): FuncDescription | null {
+  const regex = /{[^{}]*(?:{[^{}]*}[^{}]*)*}/g;
+  const matches = input.match(regex);
+
+  if (matches) {
+    return JSON.parse(matches[0]);
+  }
+
+  return null;
 }
 
 export function parseFunctionArgs(

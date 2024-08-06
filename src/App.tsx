@@ -8,13 +8,14 @@ import { getAwsClient, getAWSStreamingResponse, getOllamaStreamingResponse } fro
 import MessageBox from './MessageBox';
 import Message from './types/Message';
 import Sender from './types/Sender';
-import { searchFunctionTags, parseFunctionArgs, getUserConfig, getAwsCredentials } from './utils';
+import { parseFunctionArgs, getUserConfig, getAwsCredentials, findJsonObject } from './utils';
 import Tool from './types/Tool';
 import tools from './tools';
 import Configuration from './Configuration';
 import UserConfig from './types/UserConfig';
 import { BedrockRuntimeClient } from '@aws-sdk/client-bedrock-runtime';
 import AwsCredentials from './types/AwsCredential';
+import FuncDescription from './types/FuncDescription';
 
 const theme = createTheme({
   typography: {
@@ -52,7 +53,6 @@ function App() {
   // Load config on app load
   useEffect(() => {
     getUserConfig().then((config) => {
-      console.log(config);
       if (config.platform === 'aws') {
         getAwsCredentials()
           .then((credentials: AwsCredentials) => {
@@ -82,7 +82,7 @@ function App() {
       prompt.current += "<|eot_id|><|start_header_id|>assistant<|end_header_id|>";
       setMessages(prevMessages => [...prevMessages, message]);
 
-      let funcDescription;
+      let funcDescription: FuncDescription | null = null;
       // TODO handle no connection errors
       try {
         setMessages(prevMessages => [...prevMessages, { text: '', sender: Sender.AI }]);
@@ -112,15 +112,14 @@ function App() {
         setAbortDisabled(true);
 
         prompt.current += aiResponse;
-        funcDescription = searchFunctionTags(aiResponse);
+        funcDescription = findJsonObject(aiResponse);
 
         if (funcDescription) {
-          console.log("Func description: ", funcDescription);
           setMessages(prevMessages => prevMessages.slice(0, -1));
           // TODO setup config to make max_steps
           if (steps.current < 10) {
             const tool: Tool = tools[funcDescription.name]
-            const parsedArgs: Record<string, string | number | boolean> = parseFunctionArgs(funcDescription.args, tool.args);
+            const parsedArgs: Record<string, string | number | boolean> = parseFunctionArgs(funcDescription.parameters, tool.args);
 
             setMessages(prevMessages => [...prevMessages, {
               text: `Calling function ${funcDescription!.name}(${Object.values(parsedArgs).join(', ')})`,
