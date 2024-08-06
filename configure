@@ -15,7 +15,7 @@ fi
 if [ ! -f "$HOME/.llamaman/tools.json" ]; then
   cat <<EOF >"$HOME/.llamaman/tools.json"
 {
-  "readFile": {
+  "read_file": {
     "description": "Read the contents of a file.",
     "parameters": {
       "filename": {
@@ -25,7 +25,7 @@ if [ ! -f "$HOME/.llamaman/tools.json" ]; then
       }
     }
   },
-  "writeFile": {
+  "write_file": {
     "description": "Write content to a file.",
     "parameters": {
       "filename": {
