@@ -35,9 +35,9 @@ const Configuration = ({
   return (
     <Box sx={{
       position: 'absolute',
-      top: '50%',
-      left: '50%',
-      width: '50vw',
+      top: '75%',
+      left: '75%',
+      width: '75vw',
       transform: 'translate(-50%, -50%)',
       bgcolor: 'background.paper',
       borderRadius: '10px',
@@ -47,6 +47,7 @@ const Configuration = ({
       <Box sx={{
         display: 'grid',
         gap: '20px',
+        maxWidth: '100%',
         justifyContent: 'center',
         alignItems: 'center',
         gridTemplateAreas: `
@@ -54,6 +55,7 @@ const Configuration = ({
       "url urlInput"
       "model modelInput"
       "temperature temperatureInput"
+      "maxSteps maxStepsInput"
       "save save"`,
         gridTemplateColumns: 'auto 1fr',
       }}>
