@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Box, TextField, Button, CircularProgress, Modal } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import StopCircleIcon from '@mui/icons-material/StopCircle';
@@ -16,21 +15,6 @@ import UserConfig from './types/UserConfig';
 import { BedrockRuntimeClient } from '@aws-sdk/client-bedrock-runtime';
 import AwsCredentials from './types/AwsCredential';
 import FuncDescription from './types/FuncDescription';
-
-const theme = createTheme({
-  typography: {
-    fontFamily: 'monospace, sans-serif',
-  },
-  components: {
-    MuiCssBaseline: {
-      styleOverrides: {
-        body: {
-          fontFamily: 'monospace, sans-serif',
-        },
-      },
-    },
-  },
-});
 
 function App() {
   const [isLoading, setLoading] = useState<boolean>(true);
@@ -175,7 +159,7 @@ function App() {
   }
 
   return (
-    <ThemeProvider theme={theme}>
+    <>
       {isLoading ? <CircularProgress size={100} /> :
         <Box sx={{
           width: '100vw',
@@ -294,7 +278,7 @@ function App() {
           />
         </Box>
       </Modal>
-    </ThemeProvider>
+    </>
   );
 }
 
