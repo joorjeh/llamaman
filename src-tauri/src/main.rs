@@ -104,14 +104,49 @@ fn main() {
             get_aws_credentials,
             get_user_config,
             update_user_config,
-            add,
+            read_file,
+            write_file,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
 
 // TOOLS
+use std::fs::File;
+use std::fs::OpenOptions;
+use std::io::Write;
+use std::io::Read;
+use std::path::PathBuf;
+
 #[command]
-fn add(a: i64, b: i64) -> i64 {
-    return a + b;
+fn read_file(filename: &str) -> Result<String, String> {
+    let mut path = PathBuf::new();
+    path.push(dirs::home_dir().ok_or_else(|| "Unable to get home directory".to_string())?);
+    path.push(".llamaman");
+    path.push(filename);
+
+    let mut file = File::open(path).map_err(|err| err.to_string())?;
+    let mut contents = String::new();
+    file.read_to_string(&mut contents).map_err(|err| err.to_string())?;
+    Ok(contents)
+}
+
+#[command]
+fn write_file(filename: &str, contents: &str) -> Result<String, String> {
+    let mut path = PathBuf::new();
+    path.push(dirs::home_dir().ok_or_else(|| "Unable to get home directory".to_string())?);
+    path.push(".llamaman");
+    path.push(filename);
+    
+    let mut file = OpenOptions::new()
+        .write(true)
+        .create(true)
+        .truncate(true)
+        .open(path)
+        .map_err(|e| e.to_string())?;
+    
+    file.write_all(contents.as_bytes())
+        .map_err(|e| e.to_string())?;
+    
+    Ok(format!("Contents were written to file {}.", filename))
 }
