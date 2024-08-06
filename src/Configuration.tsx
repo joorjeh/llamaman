@@ -10,7 +10,7 @@ interface ConfigurationProps {
   setConfig: React.Dispatch<React.SetStateAction<UserConfig | null>>;
   setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
   setClient: React.Dispatch<React.SetStateAction<BedrockRuntimeClient | null>>;
-  setTimedNotifation: (notification: any) => void;
+  setSnackBar: (message: string) => void;
 }
 
 const Configuration = ({
@@ -18,7 +18,7 @@ const Configuration = ({
   setConfig,
   setOpenModal,
   setClient,
-  setTimedNotifation,
+  setSnackBar,
 }: ConfigurationProps) => {
   const [newConfig, setNewConfig] = useState<UserConfig>(config!);
 
@@ -31,10 +31,7 @@ const Configuration = ({
     updateUserConfig(newConfig).then(() => {
       setConfig(newConfig);
       setOpenModal(false);
-      setTimedNotifation({
-        severity: 'success',
-        message: 'Configuration saved.',
-      })
+      setSnackBar('Configuration updated');
     });
   };
 

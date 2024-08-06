@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Box, CircularProgress, Modal } from '@mui/material';
+import { Box, CircularProgress, Modal, Snackbar } from '@mui/material';
 import { default_tool_system_prompt } from './prompts/default_tool_system_prompt';
 import { getAwsClient, getAWSStreamingResponse, getOllamaStreamingResponse } from './platforms';
 import Message from './types/Message';
@@ -14,15 +14,13 @@ import AwsCredentials from './types/AwsCredential';
 import FuncDescription from './types/FuncDescription';
 import InputBar from './InputBar';
 import Messages from './Messages';
-import NotificationComponent from './NotificationComponent';
-import Notification from './types/Notification';
 
 function App() {
   const [isLoading, setLoading] = useState<boolean>(true);
   const [queryingModel, setQueryingModel] = useState<boolean>(false);
   const [abortDisabled, setAbortDisabled] = useState<boolean>(true);
-  const [displayNotification, setDisplayNotification] = useState<boolean>(false);
-  const [notification, setNotification] = useState<Notification>({ severity: 'info', message: '' });
+  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
+  const [snackbarMessage, setSnackbarMessage] = useState<string>('');
   const abortRef = useRef<AbortController | null>(null);
   const steps = useRef<number>(0);
   const [openModal, setOpenModal] = useState<boolean>(false);
@@ -32,12 +30,17 @@ function App() {
   const prompt = useRef<string>(default_tool_system_prompt);
   const [client, setClient] = useState<BedrockRuntimeClient | null>(null);
 
-  const setTimedNotification = (notification: Notification) => {
-    setNotification(notification);
-    setDisplayNotification(true);
-    setTimeout(() => {
-      setDisplayNotification(false);
-    }, 3000);
+  // const setTimedNotification = (notification: Notification) => {
+  //   setNotification(notification);
+  //   setDisplayNotification(true);
+  //   setTimeout(() => {
+  //     setDisplayNotification(false);
+  //   }, 3000);
+  // }
+
+  const setSnackBar = (message: string) => {
+    setSnackbarMessage(message);
+    setSnackbarOpen(true);
   }
 
   const scrollToBottom = () => {
@@ -214,11 +217,19 @@ function App() {
             config={config}
             setConfig={setConfig}
             setOpenModal={setOpenModal}
-            setTimedNotification={setTimedNotification}
+            setSnackBar={setSnackBar}
           />
         </Box>
       </Modal>
-      {displayNotification && <NotificationComponent notification={notification} />}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+        message={snackbarMessage}
+      />
     </>
   );
 }
