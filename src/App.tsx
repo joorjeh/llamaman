@@ -5,6 +5,7 @@ import { getAwsClient, getAWSStreamingResponse, getOllamaStreamingResponse } fro
 import Message from './types/Message';
 import Sender from './types/Sender';
 import { parseFunctionArgs, getUserConfig, getAwsCredentials, findJsonObject } from './utils';
+import tools from './tools';
 import Tool from './types/Tool';
 import Configuration from './Configuration';
 import UserConfig from './types/UserConfig';
