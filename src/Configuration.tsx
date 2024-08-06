@@ -35,8 +35,8 @@ const Configuration = ({
   return (
     <Box sx={{
       position: 'absolute',
-      top: '75%',
-      left: '75%',
+      top: '50%',
+      left: '50%',
       width: '75vw',
       transform: 'translate(-50%, -50%)',
       bgcolor: 'background.paper',
