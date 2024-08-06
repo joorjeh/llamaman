@@ -1,7 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Box, TextField, Button, CircularProgress, Modal } from '@mui/material';
-import SettingsIcon from '@mui/icons-material/Settings';
-import StopCircleIcon from '@mui/icons-material/StopCircle';
+import { Box, CircularProgress, Modal } from '@mui/material';
 import { default_tool_system_prompt } from './prompts/default_tool_system_prompt';
 import { getAwsClient, getAWSStreamingResponse, getOllamaStreamingResponse } from './platforms';
 import MessageBox from './MessageBox';
@@ -15,6 +13,7 @@ import UserConfig from './types/UserConfig';
 import { BedrockRuntimeClient } from '@aws-sdk/client-bedrock-runtime';
 import AwsCredentials from './types/AwsCredential';
 import FuncDescription from './types/FuncDescription';
+import InputBar from './InputBar';
 
 function App() {
   const [isLoading, setLoading] = useState<boolean>(true);
@@ -25,7 +24,6 @@ function App() {
   const [openModal, setOpenModal] = useState<boolean>(false);
   const messagesEndRef = useRef<any>(null); // TODO determine correct type
   const [messages, setMessages] = useState<Message[]>([]);
-  const [inputMessage, setInputMessage] = useState<string>('');
   const [config, setConfig] = useState<UserConfig | null>(null);
   const prompt = useRef<string>(default_tool_system_prompt);
   const [client, setClient] = useState<BedrockRuntimeClient | null>(null);
@@ -60,7 +58,6 @@ function App() {
 
   const handleSendMessage = async (message: Message) => {
     setQueryingModel(true);
-    setInputMessage('');
     if (message) {
       prompt.current += message.text;
       prompt.current += "<|eot_id|><|start_header_id|>assistant<|end_header_id|>";
@@ -194,72 +191,14 @@ function App() {
               }
               <div ref={messagesEndRef} />
             </Box>
-            <Box
-              component="form"
-              onSubmit={async (e: any) => {
-                e.preventDefault();
-                await handleSendMessage({
-                  text: inputMessage,
-                  sender: Sender.USER,
-                });
-              }}
-              sx={{
-                display: 'flex',
-                gap: '10px',
-                alignItems: 'center'
-              }}
-            >
-              <TextField
-                fullWidth
-                variant="outlined"
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                placeholder="Type a message..."
-                sx={{
-                  height: '100%'
-                }}
-                disabled={queryingModel}
-              />
-              <Button
-                variant="contained"
-                type="submit"
-                sx={{
-                  height: "100%",
-                }}
-              >
-                Send
-              </Button>
-              <Button
-                variant="contained"
-                onClick={clearChat}
-                sx={{
-                  height: "100%",
-                }}
-              >
-                Clear
-              </Button>
-              <Button disabled={abortDisabled}>
-                <StopCircleIcon
-                  sx={{
-                    height: '40px',
-                    width: '40px'
-                  }}
-                  onClick={() => {
-                    abortRef.current?.abort();
-                    setAbortDisabled(true);
-                  }}
-                />
-              </Button>
-              <Button>
-                <SettingsIcon
-                  sx={{
-                    height: '40px',
-                    width: '40px'
-                  }}
-                  onClick={() => setOpenModal(true)}
-                />
-              </Button>
-            </Box>
+            <InputBar 
+              handleSendMessage={handleSendMessage}
+              queryingModel={queryingModel}
+              clearChat={clearChat}
+              abortDisabled={abortDisabled}
+              setAbortDisabled={setAbortDisabled}
+              abortRef={abortRef}
+              setOpenModal={setOpenModal} />
           </Box>
         </Box >
       }
