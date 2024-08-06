@@ -112,6 +112,7 @@ function App() {
               text: `Function '${funcDescription.name}' was called and returned ${returnValue}.`,
               sender: Sender.SYSTEM,
             }
+            steps.current += 1;
             await handleSendMessage(systemMessage);
           } else {
             const systemMessage: Message = {
@@ -121,11 +122,13 @@ function App() {
             setMessages(prevMessages => [...prevMessages, systemMessage]);
           }
         } else {
+          steps.current = 0;
           prompt.current += "<|eot_id|><|start_header_id|>user<|end_header_id|>";
           setQueryingModel(false);
         }
       } catch (error: any) {
         setQueryingModel(false);
+        steps.current = 0;
         if (error.name === 'AbortError') {
           const systemMessage: Message = {
             text: 'Message stream aborted',
@@ -133,7 +136,7 @@ function App() {
           }
           setMessages(prevMessages => [...prevMessages, systemMessage]);
         } else if (error.name === 'TypeError') {
-          if (error.toString() === "TypeError: undefined is not an object (evaluating 'tool.args')") {
+          if (error.toString() === "TypeError: undefined is not an object (evaluating 'tool.parameters')") {
             const systemMessage: Message = {
               text: `Function ${funcDescription!.name} not found`,
               sender: Sender.SYSTEM,
