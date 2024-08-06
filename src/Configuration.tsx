@@ -54,8 +54,8 @@ const Configuration = ({
       "platform platformSelect"
       "url urlInput"
       "model modelInput"
-      "temperature temperatureInput"
       "maxSteps maxStepsInput"
+      "temperature temperatureInput"
       "save save"`,
         gridTemplateColumns: 'auto 1fr',
       }}>
@@ -122,15 +122,18 @@ const Configuration = ({
           value={newConfig.max_steps}
           onChange={(e: ChangeEvent<HTMLInputElement>) => {
             let new_max_steps = parseInt(e.target.value);
-            setNewConfig(prevConfig => {
-              return {
-                ...prevConfig,
-                max_steps: new_max_steps,
-              }
-            })
+            if (new_max_steps && new_max_steps > 0) {
+              setNewConfig(prevConfig => {
+                return {
+                  ...prevConfig,
+                  max_steps: new_max_steps,
+                }
+              })
+            } else {
+              alert("Max steps must be a positive whole number")
+            }
           }}
         />
-
         <Box sx={{ gridArea: 'temperature' }}>Temperature</Box>
         <TextField
           sx={{ gridArea: 'temperatureInput' }}
