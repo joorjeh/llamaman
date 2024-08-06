@@ -114,7 +114,7 @@ const Configuration = ({
             </MenuItem>
           ))}
         </Select>
-        <Box sx={{ gridArea: 'maxSteps' }}>URL</Box>
+        <Box sx={{ gridArea: 'maxSteps' }}>Max Steps</Box>
         <TextField
           sx={{ gridArea: 'maxStepsInput' }}
           name="maxSteps"
