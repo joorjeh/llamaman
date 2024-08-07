@@ -30,13 +30,14 @@ const InputBar = ({
     <>
       <Box
         component="form"
-        onSubmit={async (e: any) => {
+        onSubmit={(e: any) => {
           e.preventDefault();
-          await handleSendMessage({
+          handleSendMessage({
             text: inputMessage,
             sender: Sender.USER,
+          }).then(() => {
+            setInputMessage('');
           });
-          setInputMessage('');
         }}
         sx={{
           display: 'flex',
