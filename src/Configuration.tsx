@@ -1,38 +1,47 @@
-import { Box, Button, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
-import { getAwsCredentials, updateUserConfig } from "./utils";
+import { Box, Button, CircularProgress, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
+import { getUserConfig } from "./utils";
 import UserConfig from "./types/UserConfig";
-import { ChangeEvent, useState } from "react";
-import { getAwsClient, modelIds } from "./platforms";
-import { BedrockRuntimeClient } from "@aws-sdk/client-bedrock-runtime";
+import { ChangeEvent, useEffect, useState } from "react";
+import { modelIds } from "./platforms";
+import StreamingClient from "./clients/Client";
+import { getStreamingClient } from "./clients/factory";
 
 interface ConfigurationProps {
-  config: UserConfig | null;
-  setConfig: React.Dispatch<React.SetStateAction<UserConfig | null>>;
   setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
-  setClient: React.Dispatch<React.SetStateAction<BedrockRuntimeClient | null>>;
+  setClient: React.Dispatch<React.SetStateAction<StreamingClient | null>>;
   setSnackBar: (message: string) => void;
 }
 
 const Configuration = ({
-  config,
-  setConfig,
   setOpenModal,
   setClient,
   setSnackBar,
 }: ConfigurationProps) => {
-  const [newConfig, setNewConfig] = useState<UserConfig>(config!);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [newConfig, setNewConfig] = useState<UserConfig | null>(null);
+
+  useEffect(() => {
+    getUserConfig().then((config) => {
+      setNewConfig(config);
+      setLoading(false);
+    });
+  }, []);
 
   const handleConfigUpdate = async (e: any) => {
     e.preventDefault();
-    if (newConfig.platform === 'aws') {
-      const credentials = await getAwsCredentials();
-      setClient(getAwsClient(credentials));
-    }
-    updateUserConfig(newConfig).then(() => {
-      setConfig(newConfig);
+      const client = await getStreamingClient({
+        platform: newConfig!.platform,
+        options: {
+          region: 'us-west-2', // for now this is hardcoded, aws only offers one region for this service
+          model: newConfig!.model,
+          temperature: newConfig!.temperature,
+          top_p: newConfig!.top_p,
+        }
+      });
+      setClient(client);
       setOpenModal(false);
       setSnackBar('Configuration updated');
-    });
+    }
   };
 
   return (
@@ -47,6 +56,7 @@ const Configuration = ({
       boxShadow: 24,
       p: 4,
     }}>
+      { loading ? <Box sx={{ display: 'flex', justifyContent: 'center' }}><CircularProgress /></Box> :
       <Box sx={{
         display: 'grid',
         gap: '20px',
@@ -65,7 +75,7 @@ const Configuration = ({
         <Box sx={{ gridArea: 'platform' }}>Platform</Box>
         <Box sx={{ gridArea: 'platformSelect' }}>
           <Select
-            value={newConfig.platform}
+            value={newConfig!.platform}
             onChange={(e: SelectChangeEvent) => {
               setNewConfig(prevConfig => {
                 return {
@@ -164,6 +174,7 @@ const Configuration = ({
           Save
         </Button>
       </Box>
+    }
     </Box >
   )
 }
