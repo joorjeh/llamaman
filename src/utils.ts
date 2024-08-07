@@ -3,25 +3,6 @@ import UserConfig from "./types/UserConfig";
 import AwsCredentials from "./types/AwsCredential";
 import FuncDescription from "./types/FuncDescription";
 
-export function searchFunctionTags(input: string): FuncDescription | null {
-  const regex = /<function=(\w+)>(.*?)<\/function>/g;
-  const results: { name: string; parameters: any }[] = [];
-
-  let match;
-  while ((match = regex.exec(input)) !== null) {
-    const functionName = match[1];
-    const functionArgs = JSON.parse(match[2]);
-    results.push({
-      name: functionName,
-      parameters: functionArgs,
-    });
-  }
-
-  // NOTE we assume that there is only one function returned by each response,
-  // as specified in the system prompt
-  return results[0] || null;
-}
-
 export function findJsonObject(input: string): FuncDescription | null {
   const regex = /{[^{}]*(?:{[^{}]*}[^{}]*)*}/g;
   const matches = input.match(regex);
