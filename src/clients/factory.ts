@@ -33,13 +33,14 @@ export const getStreamingClient = async ({
             top_p: options.top_p,
             model: options.model,
         });
-    } else if (platform === 'openrouter') {
-        return OpenRouterClient.create({
-            temperature: options.temperature,
-            top_p: options.top_p,
-            model: options.model, 
-        });
-    }
+    } 
+    // else if (platform === 'openrouter') {
+    //     return OpenRouterClient.create({
+    //         temperature: options.temperature,
+    //         top_p: options.top_p,
+    //         model: options.model, 
+    //     });
+    // }
     // This should never be reached, simply
     // to satisfy TypeScript compiler
     return OllamaClient.create(options);
