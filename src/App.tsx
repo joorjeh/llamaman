@@ -1,19 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
 import { Box, CircularProgress, Modal, Snackbar } from '@mui/material';
 import { default_tool_system_prompt } from './prompts/default_tool_system_prompt';
-import { getAwsClient, getAWSStreamingResponse, getOllamaStreamingResponse } from './platforms';
 import Message from './types/Message';
 import Sender from './types/Sender';
-import { parseFunctionArgs, getUserConfig, getAwsCredentials, findJsonObject } from './utils';
+import { parseFunctionArgs, getUserConfig, findJsonObject } from './utils';
 import tools from './tools';
 import Tool from './types/Tool';
 import Configuration from './Configuration';
-import UserConfig from './types/UserConfig';
-import { BedrockRuntimeClient } from '@aws-sdk/client-bedrock-runtime';
-import AwsCredentials from './types/AwsCredential';
 import FuncDescription from './types/FuncDescription';
 import InputBar from './InputBar';
 import Messages from './Messages';
+import StreamingClient from './clients/Client';
+import { getStreamingClient } from './clients/factory';
 
 function App() {
   const [isLoading, setLoading] = useState<boolean>(true);
@@ -26,9 +24,9 @@ function App() {
   const [openModal, setOpenModal] = useState<boolean>(false);
   const messagesEndRef = useRef<any>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [config, setConfig] = useState<UserConfig | null>(null);
   const prompt = useRef<string>(default_tool_system_prompt);
-  const [client, setClient] = useState<BedrockRuntimeClient | null>(null);
+  const [client, setClient] = useState<StreamingClient | null>(null);
+  const [maxSteps, setMaxSteps] = useState<number>(10);
 
   const setSnackBar = (message: string) => {
     setSnackbarMessage(message);
@@ -41,13 +39,22 @@ function App() {
 
   useEffect(() => {
     getUserConfig().then((config) => {
-      if (config.platform === 'aws') {
-        getAwsCredentials()
-          .then((credentials: AwsCredentials) => {
-            setClient(getAwsClient(credentials));
-          });
-      }
-      setConfig(config);
+      return getStreamingClient({
+        platform: config.platform,
+        options: {
+          region: 'us-west-2', // for now this is hardcoded, aws only offers one region for this service
+          model: config.model,
+          temperature: config.temperature,
+          top_p: config.top_p,
+        }
+      });
+    })
+    .then((client) => {
+      setClient(client);
+      setLoading(false);
+    })
+    .catch((error) => {
+      setSnackBar(error.toString());
       setLoading(false);
     });
   }, []);
@@ -78,16 +85,9 @@ function App() {
         abortRef.current = abortController;
         setAbortDisabled(false);
         let aiResponse: string = "";
-        for await (const chunk of config!.platform === 'aws' ? getAWSStreamingResponse({
-          client: client!,
+        for await (const chunk of client!.getTextStream({
           prompt: prompt.current,
           signal: abortRef.current.signal,
-          model: config!.model,
-        }) : getOllamaStreamingResponse({
-          prompt: prompt.current,
-          signal: abortRef.current.signal,
-          url: config!.url,
-          model: config!.model,
         })) {
           aiResponse += chunk;
           setMessages(prevMessages => {
@@ -103,7 +103,7 @@ function App() {
 
         if (funcDescription) {
           setMessages(prevMessages => prevMessages.slice(0, -1));
-          if (steps.current < config!.max_steps) {
+          if (steps.current < maxSteps) {
             const tool: Tool = tools[funcDescription.name]
             const parsedArgs: Record<string, string | number | boolean> = parseFunctionArgs(funcDescription.parameters, tool.args);
 
@@ -205,10 +205,9 @@ function App() {
         <Box>
           <Configuration
             setClient={setClient}
-            config={config}
-            setConfig={setConfig}
             setOpenModal={setOpenModal}
             setSnackBar={setSnackBar}
+            setMaxSteps={setMaxSteps}
           />
         </Box>
       </Modal>
@@ -227,4 +226,3 @@ function App() {
 }
 
 export default App;
-

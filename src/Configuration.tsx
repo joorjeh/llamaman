@@ -1,13 +1,14 @@
-import { Box, Button, CircularProgress, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
+import { Box, Button, CircularProgress, MenuItem, Select, TextField } from "@mui/material";
 import { getUserConfig } from "./utils";
 import UserConfig from "./types/UserConfig";
-import { ChangeEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { modelIds } from "./platforms";
 import StreamingClient from "./clients/Client";
 import { getStreamingClient } from "./clients/factory";
 
 interface ConfigurationProps {
   setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setMaxSteps: React.Dispatch<React.SetStateAction<number>>;
   setClient: React.Dispatch<React.SetStateAction<StreamingClient | null>>;
   setSnackBar: (message: string) => void;
 }
@@ -16,6 +17,7 @@ const Configuration = ({
   setOpenModal,
   setClient,
   setSnackBar,
+  setMaxSteps,
 }: ConfigurationProps) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [newConfig, setNewConfig] = useState<UserConfig | null>(null);
@@ -27,22 +29,36 @@ const Configuration = ({
     });
   }, []);
 
-  const handleConfigUpdate = async (e: any) => {
+  const handleConfigUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-      const client = await getStreamingClient({
-        platform: newConfig!.platform,
-        options: {
-          region: 'us-west-2', // for now this is hardcoded, aws only offers one region for this service
-          model: newConfig!.model,
-          temperature: newConfig!.temperature,
-          top_p: newConfig!.top_p,
-        }
-      });
-      setClient(client);
-      setOpenModal(false);
-      setSnackBar('Configuration updated');
-    }
+    if (!newConfig) return;
+
+    const client = await getStreamingClient({
+      platform: newConfig.platform,
+      options: {
+        region: 'us-west-2',
+        model: newConfig.model,
+        temperature: newConfig.temperature,
+        top_p: newConfig.top_p,
+      }
+    });
+    setClient(client);
+    setMaxSteps(newConfig.max_steps);
+    setOpenModal(false);
+    setSnackBar('Configuration updated');
   };
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (!newConfig) {
+    return null;
+  }
 
   return (
     <Box sx={{
@@ -56,7 +72,6 @@ const Configuration = ({
       boxShadow: 24,
       p: 4,
     }}>
-      { loading ? <Box sx={{ display: 'flex', justifyContent: 'center' }}><CircularProgress /></Box> :
       <Box sx={{
         display: 'grid',
         gap: '20px',
@@ -64,26 +79,24 @@ const Configuration = ({
         justifyContent: 'center',
         alignItems: 'center',
         gridTemplateAreas: `
-      "platform platformSelect"
-      "url urlInput"
-      "model modelInput"
-      "maxSteps maxStepsInput"
-      "temperature temperatureInput"
-      "save save"`,
+          "platform platformSelect"
+          "url urlInput"
+          "model modelInput"
+          "maxSteps maxStepsInput"
+          "temperature temperatureInput"
+          "save save"`,
         gridTemplateColumns: 'auto 1fr',
       }}>
         <Box sx={{ gridArea: 'platform' }}>Platform</Box>
         <Box sx={{ gridArea: 'platformSelect' }}>
           <Select
-            value={newConfig!.platform}
-            onChange={(e: SelectChangeEvent) => {
-              setNewConfig(prevConfig => {
-                return {
-                  ...prevConfig,
-                  platform: e.target.value as string,
-                  model: modelIds[e.target.value as string][0],
-                }
-              });
+            value={newConfig.platform}
+            onChange={(e) => {
+              setNewConfig(prevConfig => prevConfig ? ({
+                ...prevConfig,
+                platform: e.target.value as string,
+                model: modelIds[e.target.value as keyof typeof modelIds][0],
+              }) : null);
             }}
           >
             <MenuItem value="aws">AWS</MenuItem>
@@ -97,13 +110,11 @@ const Configuration = ({
           variant="outlined"
           value={newConfig.url}
           disabled={newConfig.platform === 'aws'}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => {
-            setNewConfig(prevConfig => {
-              return {
-                ...prevConfig,
-                url: e.target.value as string,
-              }
-            })
+          onChange={(e) => {
+            setNewConfig(prevConfig => prevConfig ? ({
+              ...prevConfig,
+              url: e.target.value,
+            }) : null);
           }}
         />
         <Box sx={{ gridArea: 'model' }}>Model ID</Box>
@@ -112,13 +123,11 @@ const Configuration = ({
           name="model"
           variant="outlined"
           value={newConfig.model}
-          onChange={(e: SelectChangeEvent) => {
-            setNewConfig(prevConfig => {
-              return {
-                ...prevConfig,
-                model: e.target.value as string,
-              }
-            })
+          onChange={(e) => {
+            setNewConfig(prevConfig => prevConfig ? ({
+              ...prevConfig,
+              model: e.target.value as string,
+            }) : null);
           }}
         >
           {modelIds[newConfig.platform].map((modelId) => (
@@ -135,12 +144,12 @@ const Configuration = ({
           variant="outlined"
           value={newConfig.max_steps}
           inputProps={{ min: 1 }}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => {
-            let new_max_steps = Math.max(0, parseInt(e.target.value));
-            setNewConfig(prevConfig => ({
+          onChange={(e) => {
+            const new_max_steps = Math.max(1, parseInt(e.target.value));
+            setNewConfig(prevConfig => prevConfig ? ({
               ...prevConfig,
               max_steps: new_max_steps,
-            }));
+            }) : null);
           }}
         />
         <Box sx={{ gridArea: 'temperature' }}>Temperature</Box>
@@ -151,18 +160,16 @@ const Configuration = ({
           value={newConfig.temperature}
           type="number"
           inputProps={{ min: "0", step: "0.1" }}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => {
-            const value = e.target.value;
-            let new_temperature = Math.max(0, parseFloat(value));
+          onChange={(e) => {
+            const new_temperature = Math.max(0, parseFloat(e.target.value));
             if (!isNaN(new_temperature)) {
-              setNewConfig(prevConfig => ({
+              setNewConfig(prevConfig => prevConfig ? ({
                 ...prevConfig,
                 temperature: Number(new_temperature.toFixed(2)),
-              }));
+              }) : null);
             }
           }}
         />
-
         <Button
           sx={{
             gridArea: 'save',
@@ -174,9 +181,9 @@ const Configuration = ({
           Save
         </Button>
       </Box>
-    }
-    </Box >
-  )
-}
+    </Box>
+  );
+};
 
 export default Configuration;
+

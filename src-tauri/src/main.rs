@@ -25,6 +25,7 @@ struct UserConfig {
     model: String,
     temperature: f32,
     max_steps: u8,
+    top_p: f32,
 }
 
 impl Default for UserConfig {
@@ -35,6 +36,7 @@ impl Default for UserConfig {
             model: "llama3.1".to_string(),
             temperature: 0.0,
             max_steps: 10,
+            top_p: 0.9,
         }
     }
 }

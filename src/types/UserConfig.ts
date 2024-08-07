@@ -4,6 +4,7 @@ interface UserConfig {
   model: string;
   temperature: number;
   max_steps: number;
+  top_p: number;
 }
 
 export default UserConfig;
