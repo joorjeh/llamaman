@@ -1,5 +1,5 @@
 import { Box, Button, CircularProgress, MenuItem, Select, TextField } from "@mui/material";
-import { getUserConfig } from "./utils";
+import { getUserConfig, updateUserConfig } from "./utils";
 import UserConfig from "./types/UserConfig";
 import { useEffect, useState } from "react";
 import { modelIds } from "./platforms";
@@ -44,6 +44,7 @@ const Configuration = ({
     });
     setClient(client);
     setMaxSteps(newConfig.max_steps);
+    await updateUserConfig(newConfig);
     setOpenModal(false);
     setSnackBar('Configuration updated');
   };
@@ -101,7 +102,7 @@ const Configuration = ({
           >
             <MenuItem value="aws">AWS</MenuItem>
             <MenuItem value="ollama">Ollama</MenuItem>
-            <MenuItem value="openrouter">OpenRouter</MenuItem>
+            {/* <MenuItem value="openrouter">OpenRouter</MenuItem> */}
           </Select>
         </Box>
         <Box sx={{ gridArea: 'url' }}>URL</Box>
