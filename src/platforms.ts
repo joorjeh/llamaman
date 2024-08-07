@@ -7,5 +7,10 @@ export const modelIds: Record<string, string[]> = {
   "ollama": [
     "llama3",
     "llama3.1",
+  ],
+  "openrouter": [
+    "meta-llama/llama-3.1-405b-instruct",
+    "meta-llama/llama-3.1-70b-instruct",
+    "meta-llama/llama-3.1-8b-instruct",
   ]
 };

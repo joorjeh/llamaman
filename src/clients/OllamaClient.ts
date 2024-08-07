@@ -1,5 +1,6 @@
 import StreamingArgs from "../types/StreamingArgs";
 import StreamingClient from "./Client";
+import { StreamingClientOptions } from "./factory";
 
 class OllamaClient implements StreamingClient {
   model!: string;
@@ -14,12 +15,7 @@ class OllamaClient implements StreamingClient {
     temperature = 0.0,
     top_p = 0.9,
     url = 'http://localhost:11434/api/generate',
-  }: {
-    model?: string,
-    temperature?: number,
-    top_p?: number,
-    url?: string,
-  }): OllamaClient {
+  }: StreamingClientOptions): OllamaClient {
     const instance = new OllamaClient();
     instance.model = model;
     instance.temperature = temperature;

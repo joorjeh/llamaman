@@ -3,6 +3,7 @@ import StreamingClient from "./Client";
 import { getAwsCredentials } from "../utils";
 import AwsCredentials from "../types/AwsCredential";
 import StreamingArgs from "../types/StreamingArgs";
+import { StreamingClientOptions } from "./factory";
 
 class AwsClient implements StreamingClient {
   bedrock!: BedrockRuntimeClient;
@@ -17,12 +18,7 @@ class AwsClient implements StreamingClient {
     model = 'meta.llama3-1-70b-instruct-v1:0',
     temperature = 0.0,
     top_p = 0.9,
-  }: {
-    region?: string,
-    model?: string,
-    temperature?: number,
-    top_p?: number,
-  }): Promise<AwsClient> {
+  }: StreamingClientOptions): Promise<AwsClient> {
     const instance = new AwsClient();
     const credentials: AwsCredentials = await getAwsCredentials();
     instance.temperature = temperature;

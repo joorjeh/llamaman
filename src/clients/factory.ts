@@ -1,8 +1,9 @@
 import AwsClient from "./AwsClient";
 import StreamingClient from "./Client";
 import OllamaClient from "./OllamaClient";
+import OpenRouterClient from "./OpenRouterClient";
 
-interface ClientOptions {
+export interface StreamingClientOptions {
     region?: string,
     model?: string,
     temperature?: number,
@@ -15,7 +16,7 @@ export const getStreamingClient = async ({
     options,
 }: {
     platform: string,
-    options: ClientOptions,
+    options: StreamingClientOptions,
 }): Promise<StreamingClient> => {
     // Parse options based on platform
     if (platform === 'aws') {
@@ -32,8 +33,14 @@ export const getStreamingClient = async ({
             top_p: options.top_p,
             model: options.model,
         });
+    } else if (platform === 'openrouter') {
+        return OpenRouterClient.create({
+            temperature: options.temperature,
+            top_p: options.top_p,
+            model: options.model, 
+        });
     }
     // This should never be reached, simply
-    // to satisfy TypeScript's control flow analysis
+    // to satisfy TypeScript compiler
     return OllamaClient.create(options);
 }

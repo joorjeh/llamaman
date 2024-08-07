@@ -87,7 +87,7 @@ const Configuration = ({
           "save save"`,
         gridTemplateColumns: 'auto 1fr',
       }}>
-        <Box sx={{ gridArea: 'platform' }}>Platform</Box>
+        <Box sx={{ gridArea: 'platform' }}>Provider</Box>
         <Box sx={{ gridArea: 'platformSelect' }}>
           <Select
             value={newConfig.platform}
@@ -101,6 +101,7 @@ const Configuration = ({
           >
             <MenuItem value="aws">AWS</MenuItem>
             <MenuItem value="ollama">Ollama</MenuItem>
+            <MenuItem value="openrouter">OpenRouter</MenuItem>
           </Select>
         </Box>
         <Box sx={{ gridArea: 'url' }}>URL</Box>
