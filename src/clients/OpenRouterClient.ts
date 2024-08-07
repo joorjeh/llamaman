@@ -20,7 +20,7 @@ class OpenRouterClient implements StreamingClient {
     const instance = new OpenRouterClient();
 
     instance.openrouter = createOpenRouter({
-      apiKey: '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',
+      apiKey: 'YOUR_API_KEY',
     })
     instance.model = model;
     instance.temperature = temperature;
