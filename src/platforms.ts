@@ -69,7 +69,7 @@ export async function* getAWSStreamingResponse({
   client,
   prompt,
   signal,
-  model = 'meta.llama3-1-405b-instruct-v1:0',
+  model,
   temperature = 0.0,
   top_p = 0.9,
 }: StreamingArgs): AsyncGenerator<string> {
@@ -97,6 +97,56 @@ export async function* getAWSStreamingResponse({
     }
   } else {
     throw new Error("responseStream.body is undefined")
+  }
+}
+
+export async function* getStreamingResponse({
+  prompt,
+  signal,
+  model,
+  url,
+  temperature,
+  top_p,
+}: StreamingArgs): AsyncGenerator<string> {
+  const response = await fetch(url!, {
+    signal,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      prompt: prompt,
+      model: model,
+      temperature,
+      top_p,
+      stream: true,
+      raw: true,
+    }),
+  });
+
+  if (!response.ok) throw new Error('Failed to fetch response from ollama server');
+
+  const decoder = new TextDecoder();
+  if (response.body) {
+    const reader = response.body.getReader();
+    let intermediateValue = '';
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      const chunk = decoder.decode(value);
+      if (chunk.trim() !== '') {
+        try {
+          const parsed = JSON.parse(intermediateValue + chunk);
+          if (parsed.done) break;
+          intermediateValue += parsed.response;
+          yield intermediateValue;
+          intermediateValue = '';
+        } catch (error) {
+          intermediateValue += chunk;
+        }
+      }
+    }
   }
 }
 

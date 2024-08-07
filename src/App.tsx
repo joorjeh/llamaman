@@ -30,14 +30,6 @@ function App() {
   const prompt = useRef<string>(default_tool_system_prompt);
   const [client, setClient] = useState<BedrockRuntimeClient | null>(null);
 
-  // const setTimedNotification = (notification: Notification) => {
-  //   setNotification(notification);
-  //   setDisplayNotification(true);
-  //   setTimeout(() => {
-  //     setDisplayNotification(false);
-  //   }, 3000);
-  // }
-
   const setSnackBar = (message: string) => {
     setSnackbarMessage(message);
     setSnackbarOpen(true);
