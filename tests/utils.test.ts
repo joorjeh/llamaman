@@ -1,42 +1,23 @@
 import { describe, expect, test } from 'vitest';
-import { searchFunctionTags, parseFunctionArgs } from '../src/utils.ts'
+import { findJsonObject, parseFunctionArgs } from '../src/utils.ts'
 
-describe('Function Tag Tests', () => {
-  test('function tags found', () => {
-    const s = `<function=add>{"a": 119, "b": 991}</function> 
+describe('findJsonObject', () => {
+  test('Returns null when input does not contain a JSON object', () => {
+    const input = 'This is a regular string';
+    const result = findJsonObject(input);
+    expect(result).toBeNull();
+  });
 
-Note: This function call is based on the 'add' function provided. The parameters are required and must be integers.
-`
-    const actual = searchFunctionTags(s);
-    const expected = {
-      name: 'add',
-      args: {
-        a: 119,
-        b: 991,
-      }
-    }
-    expect(actual).toStrictEqual(expected);
-  })
+  test('Returns the parsed JSON object when input contains a JSON object', () => {
+    const input = 'This is some text { "name": "John", "age": 30 } and more text';
+    const result = findJsonObject(input);
+    const expected = { name: "John", age: 30 };
+    expect(result).toStrictEqual(expected);
+  });
+});
 
-  test('function tags found with different values', () => {
-    const s = `<function=multiply>{"x": 5, "y": 7}</function> 
-
-Note: This function call is based on the 'multiply' function provided. The parameters are required and must be integers.
-`
-    const actual = searchFunctionTags(s);
-    const expected = {
-      name: 'multiply',
-      args: {
-        x: 5,
-        y: 7,
-      }
-    }
-    expect(actual).toStrictEqual(expected);
-  })
-})
-
-describe('Parse function arguments', () => {
-  test('Correctly parses arguments', () => {
+describe('parseFunctionArgs', () => {
+  test('Correctly parses arguments of type number', () => {
     const argValues = {
       a: "191",
       b: "102",
@@ -53,7 +34,7 @@ describe('Parse function arguments', () => {
     expect(parsedArgs).toStrictEqual(expected);
   });
 
-  test('Correctly parses different argument types', () => {
+  test('Correctly parses arguments of different types', () => {
     const argValues = {
       x: "true",
       y: "hello",
