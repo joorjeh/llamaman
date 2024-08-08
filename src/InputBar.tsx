@@ -33,8 +33,8 @@ const InputBar = ({
         onSubmit={(e: any) => {
           e.preventDefault();
           handleSendMessage({
-            text: inputMessage,
-            sender: Sender.USER,
+            content: inputMessage,
+            role: Sender.USER,
           }).then(() => {
             setInputMessage('');
           });

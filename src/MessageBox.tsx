@@ -4,7 +4,7 @@ import Message from './types/Message';
 
 const MessageBox = ({ message, index }: { message: Message, index: number }) => {
   let alignment;
-  switch (message.sender) {
+  switch (message.role) {
     case Sender.AI:
       alignment = 'flex-end';
       break;
@@ -26,7 +26,7 @@ const MessageBox = ({ message, index }: { message: Message, index: number }) => 
       }}
     >
       {
-        message.sender === Sender.SYSTEM ?
+        message.role === Sender.SYSTEM ?
           <Box
             sx={{
               maxWidth: '70%',
@@ -35,7 +35,7 @@ const MessageBox = ({ message, index }: { message: Message, index: number }) => 
               fontStyle: 'italic',
             }}
           >
-            {message.text}
+            {message.content}
           </Box> :
           <Box
             sx={{
@@ -47,7 +47,7 @@ const MessageBox = ({ message, index }: { message: Message, index: number }) => 
               whiteSpace: 'pre-wrap'
             }}
           >
-            {message.text}
+            {message.content}
           </Box>
       }
     </Box>

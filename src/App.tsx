@@ -72,14 +72,14 @@ function App() {
   const handleSendMessage = async (message: Message) => {
     setQueryingModel(true);
     if (message) {
-      prompt.current += message.text;
+      prompt.current += message.content;
       prompt.current += "<|eot_id|><|start_header_id|>assistant<|end_header_id|>";
       setMessages(prevMessages => [...prevMessages, message]);
 
       let funcDescription: FuncDescription | null = null;
       // TODO handle no connection errors
       try {
-        setMessages(prevMessages => [...prevMessages, { text: '', sender: Sender.AI }]);
+        setMessages(prevMessages => [...prevMessages, { role: Sender.AI, content: '' }]);
 
         const abortController = new AbortController();
         abortRef.current = abortController;
@@ -92,7 +92,7 @@ function App() {
           aiResponse += chunk;
           setMessages(prevMessages => {
             const newMessages = [...prevMessages];
-            newMessages[newMessages.length - 1].text = aiResponse.trimStart();
+            newMessages[newMessages.length - 1].content = aiResponse.trimStart();
             return newMessages;
           });
         }
@@ -108,22 +108,22 @@ function App() {
             const parsedArgs: Record<string, string | number | boolean> = parseFunctionArgs(funcDescription.parameters, tool.args);
 
             setMessages(prevMessages => [...prevMessages, {
-              text: `Calling function ${funcDescription!.name}(${Object.values(parsedArgs).join(', ')})`,
-              sender: Sender.SYSTEM,
+              content: `Calling function ${funcDescription!.name}(${Object.values(parsedArgs).join(', ')})`,
+              role: Sender.SYSTEM,
             }]);
             const returnValue = await tool.f(parsedArgs);
 
             prompt.current += "<|eot_id|><|start_header_id|>system<|end_header_id|>";
             const systemMessage: Message = {
-              text: `Function '${funcDescription.name}' was called and returned ${returnValue}.`,
-              sender: Sender.SYSTEM,
+              content: `Function '${funcDescription.name}' was called and returned ${returnValue}.`,
+              role: Sender.SYSTEM,
             }
             steps.current += 1;
             await handleSendMessage(systemMessage);
           } else {
             const systemMessage: Message = {
-              text: 'Max function steps reached.',
-              sender: Sender.SYSTEM,
+              content: 'Max function steps reached.',
+              role: Sender.SYSTEM,
             }
             setMessages(prevMessages => [...prevMessages, systemMessage]);
           }
@@ -137,15 +137,15 @@ function App() {
         steps.current = 0;
         if (error.name === 'AbortError') {
           const systemMessage: Message = {
-            text: 'Message stream aborted',
-            sender: Sender.SYSTEM,
+            content: 'Message stream aborted',
+            role: Sender.SYSTEM,
           }
           setMessages(prevMessages => [...prevMessages, systemMessage]);
         } else if (error.name === 'TypeError') {
           if (error.toString() === "TypeError: undefined is not an object (evaluating 'tool.parameters')") {
             const systemMessage: Message = {
-              text: `Function ${funcDescription!.name} not found`,
-              sender: Sender.SYSTEM,
+              content: `Function ${funcDescription!.name} not found`,
+              role: Sender.SYSTEM,
             };
             setMessages(prevMessages => [...prevMessages, systemMessage]);
             console.error(`Function ${funcDescription!.name} not found`);
