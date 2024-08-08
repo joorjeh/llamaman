@@ -39,11 +39,11 @@ const FileTree: React.FC = () => {
     }}>
       {nodes.map((node, index) => {
         if (node.is_directory) {
-          return <TreeItem key={index} itemId={node.path} label={node.name}>
+          return <TreeItem onClick={(e: any) => console.log(node.path)} key={index} itemId={node.path} label={node.name}>
             {node.children.length > 0 && renderTree(node.children)}
           </TreeItem>
         } else {
-          return <TreeItem key={index} itemId={node.path} label={node.name} />
+          return <TreeItem onClick={(e: any) => console.log(node.path)} key={index} itemId={node.path} label={node.name} />
         }
       })
       }

@@ -201,13 +201,7 @@ function App() {
             borderLeft: '1px solid black',
             padding: '10px',
           }}>
-            <Button onClick={async (e: any) => {
-              e.preventDefault();
-              const tree = await invoke('get_file_tree', {pathString: '/home/anon/.llamaman'});
-              console.log("tree", tree);
-            }}>
-              <FileTree />
-            </Button>
+            <FileTree />
           </Box>
         </Box>
       }
