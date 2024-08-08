@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Box, Button, CircularProgress, Modal, Snackbar } from '@mui/material';
+import { Box, CircularProgress, Modal, Snackbar } from '@mui/material';
 import { default_tool_system_prompt } from './prompts/default_tool_system_prompt';
 import Message from './types/Message';
 import Sender from './types/Sender';
@@ -12,7 +12,6 @@ import InputBar from './InputBar';
 import Messages from './Messages';
 import StreamingClient from './clients/Client';
 import { getStreamingClient } from './clients/factory';
-import { invoke } from '@tauri-apps/api/tauri';
 import FileTree from './FileTree';
 
 function App() {

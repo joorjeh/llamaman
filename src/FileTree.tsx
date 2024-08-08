@@ -37,6 +37,7 @@ const FileTree: React.FC = () => {
     <SimpleTreeView sx={{
         textTransform: 'none',
     }}>
+      <TreeItem itemId={workspaceDir} label={workspaceDir}>
       {nodes.map((node, index) => {
         if (node.is_directory) {
           return <TreeItem onClick={(e: any) => console.log(node.path)} key={index} itemId={node.path} label={node.name}>
@@ -47,6 +48,7 @@ const FileTree: React.FC = () => {
         }
       })
       }
+      </TreeItem>
     </SimpleTreeView>
   );
 
