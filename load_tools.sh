@@ -89,6 +89,8 @@ BEGIN {
     print "            get_aws_credentials,"
     print "            get_user_config,"
     print "            update_user_config,"
+    print "            read_file,"
+    print "            write_file,"
     for (i in func_array) {
         print "            " func_array[i] ","
     }
