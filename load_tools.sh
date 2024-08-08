@@ -6,13 +6,21 @@ if ! command -v jq &>/dev/null; then
 fi
 
 input_file="$HOME/.llamaman/tools.json"
-output_file="$HOME/.local/llamaman/src/tools.ts"
+output_file="$HOME/.local/llamaman/src/tools/user_tools.ts"
 
 cat <<EOF >"$output_file"
-import Tool from './types/Tool';
-import { invoke } from '@tauri-apps/api/tauri';
+import Tool from '../types/Tool';
+EOF
 
-const tools: Record<string, Tool> = {
+# Check if there are any tools in the tools.json file
+if jq -r 'keys[]' "$input_file" | read -r _; then
+  cat <<EOF >>"$output_file"
+import { invoke } from '@tauri-apps/api/tauri';
+EOF
+fi
+
+cat <<EOF >>"$output_file"
+const user_tools: Record<string, Tool> = {
 EOF
 
 jq -r 'keys[]' "$input_file" | while read -r tool_name; do
@@ -22,9 +30,7 @@ jq -r 'keys[]' "$input_file" | while read -r tool_name; do
     description: $(jq -r ".$tool_name.description" "$input_file" | sed 's/^/'"'"'/; s/$/'"'"'/'),
     args: {
 EOF
-
   jq -r ".$tool_name.parameters | to_entries[] | \"\t\t\(.key): \\\"\(.value.param_type)\\\",\"" "$input_file" >>"$output_file"
-
   cat <<EOF >>"$output_file"
     },
     f: async ({ $(jq -r ".$tool_name.parameters | keys | join(\", \")" "$input_file") }: { $(jq -r ".$tool_name.parameters | to_entries[] | \"\(.key): \(.value.param_type)\"" "$input_file" | paste -sd ", " -) }): Promise<string> => {
@@ -41,8 +47,7 @@ done
 
 cat <<EOF >>"$output_file"
 };
-
-export default tools;
+export default user_tools;
 EOF
 
 # Load Rust fns and add names to generate_handler macro
@@ -52,8 +57,8 @@ output_file="$HOME/.local/llamaman/src-tauri/src/main.rs"
 
 temp_file=$(mktemp)
 
-# Copy content up to and including the line with '// TOOLS' to the temp file
-sed '/\/\/ TOOLS/q' "$output_file" >"$temp_file"
+# Copy content up to and including the line with '// User defined tools' to the temp file
+sed '/\/\/ User defined tools/q' "$output_file" >"$temp_file"
 
 # Append the entire source file to the temp file
 cat "$input_file" >>"$temp_file"
