@@ -152,15 +152,6 @@ function App() {
           }
         } else {
           setSnackBar(error.toString());
-          // TODO not sure about this, it will add ANY error to chat, 
-          // which the model probably cannot handle 
-          // prompt.current += "<|eot_id|><|start_header_id|>system<|end_header_id|>";
-          // const systemMessage: Message = {
-          //   text: `Function ${funcDescription!.name} returned error ${error}`,
-          //   sender: Sender.SYSTEM,
-          // }
-          // await handleSendMessage(systemMessage);
-          // console.error("Error: ", error.toString())
         }
       }
     }
