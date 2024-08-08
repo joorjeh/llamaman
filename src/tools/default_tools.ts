@@ -33,7 +33,22 @@ const default_tools: Record<string, Tool> = {
       }
     }
   },
+  system_call: {
+    toolDefinition: `{\"description\":\"Run a bash command.\",\"parameters\":{\"command\":{\"param_type\":\"string\",\"description\":\"The bash command to run\",\"required\":true}},\"name\":\"system_call\"}`,
+    description: 'Run a bash command.',
+    args: {
+      command: "string",
+    },
+    f: async ({ command }: { command: string }): Promise<string> => {
+      try {
+        const response: string = await invoke('system_call', { command });
+        return response;
+      } catch (error) {
+        return String(error);
+      }
+    }
+  }
 };
 
-
 export default default_tools;
+

@@ -12,6 +12,27 @@ use std::fs::OpenOptions;
 use std::io::Write;
 use std::io::Read;
 use std::path::PathBuf;
+use std::process::Command;
+
+// Idiomatic error for Tauri 
+#[derive(Debug, thiserror::Error)]
+enum Error {
+  #[error(transparent)]
+  Io(#[from] std::io::Error),
+  #[error("Command failed with status: {0:?}")]
+  CommandFailed(std::process::ExitStatus),
+  #[error("UTF-8 conversion error")]
+  Utf8Error(#[from] std::string::FromUtf8Error),
+}
+
+impl serde::Serialize for Error {
+  fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+  where
+    S: serde::ser::Serializer,
+  {
+    serializer.serialize_str(self.to_string().as_ref())
+  }
+}
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 struct AwsCredentials {
@@ -97,7 +118,6 @@ fn get_aws_credentials() -> AwsCredentials {
     let contents = std::fs::read_to_string(credentials_path).expect("Failed to read credentials file");
 
     let config: AwsConfig = toml::de::from_str(&contents).expect("Failed to parse toml file");
-    
     config.default
 }
 
@@ -110,32 +130,44 @@ fn update_user_config(state: State<ConfigState>, new_config: UserConfig) {
 
 // Default tools
 #[command]
-fn read_file(filename: &str) -> Result<String, String> {
+fn system_call(command: &str) -> Result<String, Error> {
+    let output = Command::new("bash")
+        .arg("-c")
+        .arg(command)
+        .output()?;
+
+    if output.status.success() {
+        Ok(String::from_utf8(output.stdout)?)
+    } else {
+        Err(Error::CommandFailed(output.status))
+    }
+}
+
+#[command]
+fn read_file(filename: &str) -> Result<String, Error> {
     let config = read_config();
-    let mut path = PathBuf::from_str(&config.workspace_dir).map_err(|err| err.to_string())?;
+    let mut path = PathBuf::from(&config.workspace_dir);
     path.push(filename);
 
-    let mut file = File::open(path).map_err(|err| err.to_string())?;
+    let mut file = File::open(path)?;
     let mut contents = String::new();
-    file.read_to_string(&mut contents).map_err(|err| err.to_string())?;
+    file.read_to_string(&mut contents)?;
     Ok(contents)
 }
 
 #[command]
-fn write_file(filename: &str, content: &str) -> Result<String, String> {
+fn write_file(filename: &str, content: &str) -> Result<String, Error> {
     let config = read_config();
-    let mut path = PathBuf::from_str(&config.workspace_dir).map_err(|err| err.to_string())?;
+    let mut path = PathBuf::from_str(&config.workspace_dir).map_err(|err| err.to_string()).unwrap();
     path.push(filename);
     
     let mut file = OpenOptions::new()
         .write(true)
         .create(true)
         .truncate(true)
-        .open(path)
-        .map_err(|e| e.to_string())?;
+        .open(path)?;
     
-    file.write_all(content.as_bytes())
-        .map_err(|e| e.to_string())?;
+    file.write_all(content.as_bytes())?;
     
     Ok(format!("Contents were written to file {}.", filename))
 }
@@ -150,6 +182,7 @@ fn main() {
             get_aws_credentials,
             get_user_config,
             update_user_config,
+            system_call,
             read_file,
             write_file,
         ])
