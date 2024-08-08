@@ -3,9 +3,15 @@
 
 use serde::{Deserialize, Serialize};
 use std::fs;
+use std::str::FromStr;
 use tauri::{command, State};
 use dirs;
 use toml;
+use std::fs::File;
+use std::fs::OpenOptions;
+use std::io::Write;
+use std::io::Read;
+use std::path::PathBuf;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 struct AwsCredentials {
@@ -26,6 +32,7 @@ struct UserConfig {
     temperature: f32,
     max_steps: u8,
     top_p: f32,
+    workspace_dir: String,
 }
 
 impl Default for UserConfig {
@@ -37,6 +44,7 @@ impl Default for UserConfig {
             temperature: 0.0,
             max_steps: 10,
             top_p: 0.9,
+            workspace_dir: dirs::home_dir().unwrap().join(".llamaman").to_str().unwrap().to_string(),
         }
     }
 }
@@ -100,6 +108,38 @@ fn update_user_config(state: State<ConfigState>, new_config: UserConfig) {
     write_config(&new_config);
 }
 
+// Default tools
+#[command]
+fn read_file(filename: &str) -> Result<String, String> {
+    let config = read_config();
+    let mut path = PathBuf::from_str(&config.workspace_dir).map_err(|err| err.to_string())?;
+    path.push(filename);
+
+    let mut file = File::open(path).map_err(|err| err.to_string())?;
+    let mut contents = String::new();
+    file.read_to_string(&mut contents).map_err(|err| err.to_string())?;
+    Ok(contents)
+}
+
+#[command]
+fn write_file(filename: &str, content: &str) -> Result<String, String> {
+    let config = read_config();
+    let mut path = PathBuf::from_str(&config.workspace_dir).map_err(|err| err.to_string())?;
+    path.push(filename);
+    
+    let mut file = OpenOptions::new()
+        .write(true)
+        .create(true)
+        .truncate(true)
+        .open(path)
+        .map_err(|e| e.to_string())?;
+    
+    file.write_all(content.as_bytes())
+        .map_err(|e| e.to_string())?;
+    
+    Ok(format!("Contents were written to file {}.", filename))
+}
+
 fn main() {
     let config = read_config();
     let config_state = ConfigState(std::sync::Mutex::new(config));
@@ -118,41 +158,3 @@ fn main() {
 }
 
 // TOOLS
-use std::fs::File;
-use std::fs::OpenOptions;
-use std::io::Write;
-use std::io::Read;
-use std::path::PathBuf;
-
-#[command]
-fn read_file(filename: &str) -> Result<String, String> {
-    let mut path = PathBuf::new();
-    path.push(dirs::home_dir().ok_or_else(|| "Unable to get home directory".to_string())?);
-    path.push(".llamaman");
-    path.push(filename);
-
-    let mut file = File::open(path).map_err(|err| err.to_string())?;
-    let mut contents = String::new();
-    file.read_to_string(&mut contents).map_err(|err| err.to_string())?;
-    Ok(contents)
-}
-
-#[command]
-fn write_file(filename: &str, content: &str) -> Result<String, String> {
-    let mut path = PathBuf::new();
-    path.push(dirs::home_dir().ok_or_else(|| "Unable to get home directory".to_string())?);
-    path.push(".llamaman");
-    path.push(filename);
-    
-    let mut file = OpenOptions::new()
-        .write(true)
-        .create(true)
-        .truncate(true)
-        .open(path)
-        .map_err(|e| e.to_string())?;
-    
-    file.write_all(content.as_bytes())
-        .map_err(|e| e.to_string())?;
-    
-    Ok(format!("Contents were written to file {}.", filename))
-}

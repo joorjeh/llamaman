@@ -5,6 +5,7 @@ interface UserConfig {
   temperature: number;
   max_steps: number;
   top_p: number;
+  workspace_dir: string;
 }
 
 export default UserConfig;

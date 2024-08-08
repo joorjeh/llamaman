@@ -12,81 +12,42 @@ model = "llama3.1"
 temperature = 0.0
 max_steps = 10
 top_p = 0.9
+workspace_dir = $HOME/.llamaman
 EOF
 fi
 
 if [ ! -f "$HOME/.llamaman/tools.json" ]; then
   cat <<EOF >"$HOME/.llamaman/tools.json"
-{
-  "read_file": {
-    "description": "Read the contents of a file.",
-    "parameters": {
-      "filename": {
-        "param_type": "string",
-        "description": "The name of the file to read",
-        "required": true
-      }
-    }
-  },
-  "write_file": {
-    "description": "Write content to a file.",
-    "parameters": {
-      "filename": {
-        "param_type": "string",
-        "description": "The name of the file to write",
-        "required": true
-      },
-      "content": {
-        "param_type": "string",
-        "description": "The content to write to the file",
-        "required": true
-      }
-    }
-  }
-}
+// Example tool def
+//{
+//  "do_thing": {
+//    "description": "Do the thing.",
+//    "parameters": {
+//      "a": {
+//        "param_type": "number",
+//        "description": "A number arg",
+//        "required": true
+//      },
+//      "b": {
+//        "param_type": "string",
+//        "description": "A string arg",
+//        "required": false
+//      }
+//    },
+//    ...more tools
+//  }
+//}
 EOF
 fi
 
 if [ ! -f "$HOME/.llamaman/tools.rs" ]; then
   cat <<EOF >"$HOME/.llamaman/tools.rs"
-use std::fs::File;
-use std::fs::OpenOptions;
-use std::io::Write;
-use std::io::Read;
-use std::path::PathBuf;
-
-#[command]
-fn read_file(filename: &str) -> Result<String, String> {
-    let mut path = PathBuf::new();
-    path.push(dirs::home_dir().ok_or_else(|| "Unable to get home directory".to_string())?);
-    path.push(".llamaman");
-    path.push(filename);
-
-    let mut file = File::open(path).map_err(|err| err.to_string())?;
-    let mut contents = String::new();
-    file.read_to_string(&mut contents).map_err(|err| err.to_string())?;
-    Ok(contents)
-}
-
-#[command]
-fn write_file(filename: &str, content: &str) -> Result<String, String> {
-    let mut path = PathBuf::new();
-    path.push(dirs::home_dir().ok_or_else(|| "Unable to get home directory".to_string())?);
-    path.push(".llamaman");
-    path.push(filename);
-    
-    let mut file = OpenOptions::new()
-        .write(true)
-        .create(true)
-        .truncate(true)
-        .open(path)
-        .map_err(|e| e.to_string())?;
-    
-    file.write_all(content.as_bytes())
-        .map_err(|e| e.to_string())?;
-    
-    Ok(format!("Contents were written to file {}.", filename))
-}
+// Define tools here
+// Example tool:
+// [command]
+// fn do_thing(a: f32, b: String) {
+//   a + b
+// }
 EOF
 fi
 

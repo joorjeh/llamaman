@@ -80,6 +80,7 @@ const Configuration = ({
         justifyContent: 'center',
         alignItems: 'center',
         gridTemplateAreas: `
+          "workspace workspaceInput"
           "platform platformSelect"
           "url urlInput"
           "model modelInput"
@@ -88,6 +89,19 @@ const Configuration = ({
           "save save"`,
         gridTemplateColumns: 'auto 1fr',
       }}>
+         <Box sx={{ gridArea: 'workspace' }}>Workspace Dir</Box>
+        <TextField
+          sx={{ gridArea: 'workspaceInput' }}
+          name="workspace"
+          variant="outlined"
+          value={newConfig.workspace_dir}
+          onChange={(e) => {
+            setNewConfig(prevConfig => prevConfig ? ({
+              ...prevConfig,
+              workspace_dir: e.target.value,
+            }) : null);
+          }}
+        />
         <Box sx={{ gridArea: 'platform' }}>Provider</Box>
         <Box sx={{ gridArea: 'platformSelect' }}>
           <Select
