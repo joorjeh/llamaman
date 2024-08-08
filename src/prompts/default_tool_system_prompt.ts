@@ -1,5 +1,4 @@
-import default_tools from '../tools/default_tools';
-import user_tools from '../tools/user_tools';
+import tools from '../tools/tools';
 
 export const default_tool_system_prompt: string = `
 Cutting Knowledge Date: December 2023
@@ -11,8 +10,7 @@ Today Date: 23 Jul 2024
 If responding with a function call respond in the format {"name": function name, "parameters": dictionary of argument name and its value}. Do not use variables.
 
 You have access to the following functions:
-${Object.values(default_tools).map(tool => tool.toolDefinition)}
-${Object.values(user_tools).map(tool => tool.toolDefinition)}
+${Object.values(tools).map(tool => tool.toolDefinition)}
 
 Reminder:
 - ONLY call functions listed in available functions

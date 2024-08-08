@@ -4,7 +4,7 @@ import { default_tool_system_prompt } from './prompts/default_tool_system_prompt
 import Message from './types/Message';
 import Sender from './types/Sender';
 import { parseFunctionArgs, getUserConfig, findJsonObject } from './utils';
-import tools from './tools';
+import tools from './tools/tools';
 import Tool from './types/Tool';
 import Configuration from './Configuration';
 import FuncDescription from './types/FuncDescription';
@@ -55,14 +55,14 @@ function App() {
         }
       });
     })
-    .then((client) => {
-      setClient(client);
-      setLoading(false);
-    })
-    .catch((error) => {
-      setSnackBar(error.toString());
-      setLoading(false);
-    });
+      .then((client) => {
+        setClient(client);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setSnackBar(error.toString());
+        setLoading(false);
+      });
   }, []);
 
   useEffect(() => {
@@ -99,7 +99,7 @@ function App() {
           aiChunks += chunk;
           setMessages(prevMessages => {
             const newMessages = [...prevMessages];
-            newMessages[newMessages.length - 1].content = aiChunks.trimStart(); 
+            newMessages[newMessages.length - 1].content = aiChunks.trimStart();
             return newMessages;
           });
         }
