@@ -18,36 +18,13 @@ fi
 
 if [ ! -f "$HOME/.llamaman/tools.json" ]; then
   cat <<EOF >"$HOME/.llamaman/tools.json"
-// Example tool def
-//{
-//  "do_thing": {
-//    "description": "Do the thing.",
-//    "parameters": {
-//      "a": {
-//        "param_type": "number",
-//        "description": "A number arg",
-//        "required": true
-//      },
-//      "b": {
-//        "param_type": "string",
-//        "description": "A string arg",
-//        "required": false
-//      }
-//    },
-//    ...more tools
-//  }
-//}
+// List tool specs here
 EOF
 fi
 
 if [ ! -f "$HOME/.llamaman/tools.rs" ]; then
   cat <<EOF >"$HOME/.llamaman/tools.rs"
 // Define tools here
-// Example tool:
-// [command]
-// fn do_thing(a: f32, b: String) {
-//   a + b
-// }
 EOF
 fi
 
