@@ -22,8 +22,8 @@ const FileTree: React.FC = () => {
     const fetchFileTree = async () => {
       try {
         const config = await getUserConfig();
-        const fileTree = await invoke('get_file_tree', { pathString: config.workspace_dir });
-        setFileTree(fileTree as FileNode[]);
+        const fileTree: FileNode[] = await invoke('get_file_tree', { pathString: config.workspace_dir });
+        setFileTree(fileTree);
         setWorkspaceDir(config.workspace_dir);
       } catch (err) {
         setError('Failed to load file tree.');
@@ -33,35 +33,49 @@ const FileTree: React.FC = () => {
     fetchFileTree();
   }, []);
 
-  const renderTree = (nodes: FileNode[]): JSX.Element => (
-    <SimpleTreeView sx={{
-        textTransform: 'none',
-    }}>
-      <TreeItem itemId={workspaceDir} label={workspaceDir}>
-      {nodes.map((node, index) => {
-        if (node.is_directory) {
-          return <TreeItem onClick={(e: any) => console.log(node.path)} key={index} itemId={node.path} label={node.name}>
-            {node.children.length > 0 && renderTree(node.children)}
-          </TreeItem>
-        } else {
-          return <TreeItem onClick={(e: any) => console.log(node.path)} key={index} itemId={node.path} label={node.name} />
-        }
-      })
-      }
-      </TreeItem>
-    </SimpleTreeView>
-  );
+  const renderTree = (nodes: FileNode[]): JSX.Element => {
+    return (
+      <SimpleTreeView
+        sx={{
+          textTransform: 'none',
+        }}
+        multiSelect
+        onItemSelectionToggle={handleItemSelectionToggle}
+      >
+        {nodes.map((node, index) => {
+          if (node.is_directory) {
+            return (
+              <TreeItem key={index} itemId={node.path} label={node.name}>
+                {node.children.length > 0 && renderTree(node.children)}
+              </TreeItem>
+            );
+          } else {
+            return (
+              <TreeItem key={index} itemId={node.path} label={node.name} />
+            );
+          }
+        })}
+      </SimpleTreeView>
+    );
+  };
 
   if (error) {
     return <div>{error}</div>;
   }
 
+  const handleItemSelectionToggle = (
+    event: React.SyntheticEvent,
+    itemId: string,
+    isSelected: boolean,
+  ) => {
+    event.preventDefault();
+    console.log(itemId, isSelected);
+  };
+
   return (
     <>
       {fileTree ? (
-        <SimpleTreeView>
-          {renderTree(fileTree)}
-        </SimpleTreeView>
+        renderTree(fileTree)
       ) : (
         <Box>
           Loading...

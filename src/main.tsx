@@ -7,13 +7,15 @@ import { ThemeProvider } from "@emotion/react";
 
 const theme = createTheme({
   typography: {
-    fontFamily: 'monospace, sans-serif',
+    // fontFamily: 'monospace, sans-serif',
+    fontFamily: 'sans-serif',
   },
   components: {
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          fontFamily: 'monospace, sans-serif',
+          // fontFamily: 'monospace, sans-serif',
+          fontFamily: 'sans-serif',
         },
       },
     },
