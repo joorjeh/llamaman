@@ -4,6 +4,7 @@ import { getAwsCredentials } from "../utils";
 import AwsCredentials from "../types/AwsCredential";
 import StreamingArgs from "../types/StreamingArgs";
 import { StreamingClientOptions } from "./factory";
+import { generate_llama3_prompt } from "../prompts/utils";
 
 class AwsClient implements StreamingClient {
   bedrock!: BedrockRuntimeClient;
@@ -15,7 +16,7 @@ class AwsClient implements StreamingClient {
 
   static async create({
     region = 'us-west-2',
-    model = 'meta.llama3-1-70b-instruct-v1:0',
+    model = 'meta.llama3-1-405b-instruct-v1:0',
     temperature = 0.0,
     top_p = 0.9,
   }: StreamingClientOptions): Promise<AwsClient> {
@@ -36,9 +37,12 @@ class AwsClient implements StreamingClient {
   }
 
   async *getTextStream({
-    prompt,
+    messages,
     signal,
   }: StreamingArgs): AsyncGenerator<string> {
+    let prompt = generate_llama3_prompt(messages);
+    prompt += "<|start_header_id|>assistant<|end_header_id|>\n";
+
     const command = new InvokeModelWithResponseStreamCommand({
       contentType: "application/json",
       modelId: this.model,

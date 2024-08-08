@@ -23,10 +23,16 @@ function App() {
   const steps = useRef<number>(0);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const messagesEndRef = useRef<any>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const prompt = useRef<string>(default_tool_system_prompt);
   const [client, setClient] = useState<StreamingClient | null>(null);
   const [maxSteps, setMaxSteps] = useState<number>(10);
+  const [messages, setMessages] = useState<Message[]>([{
+    role: Sender.SYSTEM,
+    content: default_tool_system_prompt,
+  }]);
+  const messagesRef = useRef<Message[]>([{
+    role: Sender.SYSTEM,
+    content: default_tool_system_prompt,
+  }]);
 
   const setSnackBar = (message: string) => {
     setSnackbarMessage(message);
@@ -65,15 +71,16 @@ function App() {
 
   const clearChat = (e: any) => {
     e.preventDefault();
-    setMessages([]);
-    prompt.current = default_tool_system_prompt;
+    setMessages([{
+      role: Sender.SYSTEM,
+      content: default_tool_system_prompt,
+    }]);
   }
 
   const handleSendMessage = async (message: Message) => {
     setQueryingModel(true);
     if (message) {
-      prompt.current += message.content;
-      prompt.current += "<|eot_id|><|start_header_id|>assistant<|end_header_id|>";
+      messagesRef.current = [...messagesRef.current, message];
       setMessages(prevMessages => [...prevMessages, message]);
 
       let funcDescription: FuncDescription | null = null;
@@ -84,23 +91,23 @@ function App() {
         const abortController = new AbortController();
         abortRef.current = abortController;
         setAbortDisabled(false);
-        let aiResponse: string = "";
+        let aiChunks = '';
         for await (const chunk of client!.getTextStream({
-          prompt: prompt.current,
+          messages: messagesRef.current,
           signal: abortRef.current.signal,
         })) {
-          aiResponse += chunk;
+          aiChunks += chunk;
           setMessages(prevMessages => {
             const newMessages = [...prevMessages];
-            newMessages[newMessages.length - 1].content = aiResponse.trimStart();
+            newMessages[newMessages.length - 1].content = aiChunks.trimStart(); 
             return newMessages;
           });
         }
+        messagesRef.current = [...messagesRef.current, { role: Sender.AI, content: aiChunks.trimStart() }];
         setAbortDisabled(true);
 
-        prompt.current += aiResponse;
-        funcDescription = findJsonObject(aiResponse);
-
+        // TODO this can be refactored to separate function factory class
+        funcDescription = findJsonObject(messagesRef.current[messagesRef.current.length - 1].content);
         if (funcDescription) {
           setMessages(prevMessages => prevMessages.slice(0, -1));
           if (steps.current < maxSteps) {
@@ -113,7 +120,6 @@ function App() {
             }]);
             const returnValue = await tool.f(parsedArgs);
 
-            prompt.current += "<|eot_id|><|start_header_id|>system<|end_header_id|>";
             const systemMessage: Message = {
               content: `Function '${funcDescription.name}' was called and returned ${returnValue}.`,
               role: Sender.SYSTEM,
@@ -122,14 +128,14 @@ function App() {
             await handleSendMessage(systemMessage);
           } else {
             const systemMessage: Message = {
-              content: 'Max function steps reached.',
+              content: 'Max function steps reached, function calling cancelled.',
               role: Sender.SYSTEM,
             }
             setMessages(prevMessages => [...prevMessages, systemMessage]);
+            steps.current = 0;
           }
         } else {
           steps.current = 0;
-          prompt.current += "<|eot_id|><|start_header_id|>user<|end_header_id|>";
           setQueryingModel(false);
         }
       } catch (error: any) {
@@ -152,6 +158,7 @@ function App() {
           }
         } else {
           setSnackBar(error.toString());
+          console.error(error);
         }
       }
     }
@@ -178,7 +185,7 @@ function App() {
             boxSizing: 'border-box',
             overflow: 'hidden',
           }}>
-            <Messages messages={messages} messagesEndRef={messagesEndRef} />
+            <Messages messages={messages.slice(1)} messagesEndRef={messagesEndRef} />
             <InputBar
               handleSendMessage={handleSendMessage}
               queryingModel={queryingModel}

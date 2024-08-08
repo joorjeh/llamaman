@@ -1,8 +1,6 @@
 import tools from '../tools';
 
 export const default_tool_system_prompt: string = `
-<|begin_of_text|><|start_header_id|>system<|end_header_id|>
-
 Cutting Knowledge Date: December 2023
 Today Date: 23 Jul 2024
 
@@ -20,6 +18,4 @@ Reminder:
 - Required parameters MUST be specified
 - ONLY call one function at a time
 - If a function is not needed just reply normally
-
-<|eot_id|><|start_header_id|>user<|end_header_id|>
 `;

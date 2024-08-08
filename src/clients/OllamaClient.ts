@@ -1,3 +1,4 @@
+import { generate_llama3_prompt } from "../prompts/utils";
 import StreamingArgs from "../types/StreamingArgs";
 import StreamingClient from "./Client";
 import { StreamingClientOptions } from "./factory";
@@ -25,9 +26,11 @@ class OllamaClient implements StreamingClient {
   }
 
   async *getTextStream({
-    prompt,
+    messages,
     signal,
   }: StreamingArgs): AsyncGenerator<string> {
+    const prompt = generate_llama3_prompt(messages);
+
     const response = await fetch(this.url, {
       signal,
       method: 'POST',
