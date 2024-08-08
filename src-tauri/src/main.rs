@@ -70,6 +70,25 @@ impl Default for UserConfig {
     }
 }
 
+fn populate_file_tree(path: &PathBuf, file_tree: &mut Vec<FileNode>) -> Result<(), Error> {
+    for entry in fs::read_dir(path).map_err(|err| err.to_string()).unwrap() {
+        let entry = entry.map_err(|err| err.to_string()).unwrap();
+        let metadata = entry.metadata().map_err(|err| err.to_string()).unwrap();
+        let file_node = FileNode {
+            name: entry.file_name().to_string_lossy().to_string(),
+            path: entry.path().to_string_lossy().to_string(),
+            is_directory: metadata.is_dir(),
+            children: Vec::new(),
+        };
+        file_tree.push(file_node);
+
+        if metadata.is_dir() {
+            populate_file_tree(&entry.path(), &mut file_tree.last_mut().unwrap().children)?;
+        }
+    }
+    Ok(())
+}
+
 struct ConfigState(std::sync::Mutex<UserConfig>);
 
 fn get_config_path() -> std::path::PathBuf {
@@ -148,6 +167,23 @@ fn system_call(command: &str) -> Result<String, Error> {
     }
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+struct FileNode {
+    name: String,
+    path: String,
+    is_directory: bool,
+    children: Vec<FileNode>,
+}
+
+#[command]
+fn get_file_tree(path_string: String) -> Result<Vec<FileNode>, Error> {
+    let path = PathBuf::from_str(&path_string).map_err(|err| err.to_string()).unwrap();
+
+    let mut file_tree = Vec::new();
+    populate_file_tree(&path, &mut file_tree)?;
+    Ok(file_tree)
+}
+
 #[command]
 fn read_file(filename: &str) -> Result<String, Error> {
     let config = read_config();
@@ -188,6 +224,7 @@ fn main() {
             get_user_config,
             update_user_config,
             system_call,
+            get_file_tree,
             read_file,
             write_file,
         ])

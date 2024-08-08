@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Box, CircularProgress, Modal, Snackbar } from '@mui/material';
+import { Box, Button, CircularProgress, Modal, Snackbar } from '@mui/material';
 import { default_tool_system_prompt } from './prompts/default_tool_system_prompt';
 import Message from './types/Message';
 import Sender from './types/Sender';
@@ -12,6 +12,8 @@ import InputBar from './InputBar';
 import Messages from './Messages';
 import StreamingClient from './clients/Client';
 import { getStreamingClient } from './clients/factory';
+import { invoke } from '@tauri-apps/api/tauri';
+import FileTree from './FileTree';
 
 function App() {
   const [isLoading, setLoading] = useState<boolean>(true);
@@ -171,7 +173,6 @@ function App() {
           width: '100vw',
           height: '100vh',
           display: 'flex',
-          flexDirection: 'column',
           position: 'fixed',
         }}>
           <Box sx={{
@@ -195,7 +196,20 @@ function App() {
               abortRef={abortRef}
               setOpenModal={setOpenModal} />
           </Box>
-        </Box >
+          <Box sx={{
+            width: '400px',
+            borderLeft: '1px solid black',
+            padding: '10px',
+          }}>
+            <Button onClick={async (e: any) => {
+              e.preventDefault();
+              const tree = await invoke('get_file_tree', {pathString: '/home/anon/.llamaman'});
+              console.log("tree", tree);
+            }}>
+              <FileTree />
+            </Button>
+          </Box>
+        </Box>
       }
       <Modal
         open={openModal}

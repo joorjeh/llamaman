@@ -701,7 +701,7 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.24.7"
 
-"@babel/runtime@^7.12.5", "@babel/runtime@^7.18.3", "@babel/runtime@^7.23.9", "@babel/runtime@^7.5.5", "@babel/runtime@^7.8.7", "@babel/runtime@^7.9.2":
+"@babel/runtime@^7.12.5", "@babel/runtime@^7.18.3", "@babel/runtime@^7.23.9", "@babel/runtime@^7.25.0", "@babel/runtime@^7.5.5", "@babel/runtime@^7.8.7", "@babel/runtime@^7.9.2":
   version "7.25.0"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.25.0.tgz#3af9a91c1b739c569d5d80cc917280919c544ecb"
   integrity sha512-7dRy4DwXwtzBrPbZflqxnvfxLF8kdZXPkhymtDeFoFqE6ldzjQFgYTtYIFARcLEYDrqfBfYcZt1WqFxRoyC9Rw==
@@ -1094,6 +1094,28 @@
     clsx "^2.1.1"
     prop-types "^15.8.1"
     react-is "^18.3.1"
+
+"@mui/x-internals@7.12.0":
+  version "7.12.0"
+  resolved "https://registry.yarnpkg.com/@mui/x-internals/-/x-internals-7.12.0.tgz#9154efbf97ed5745cbd3598afea08c785c13253e"
+  integrity sha512-zgu/JqSXBflSvtzfFN8lNi5Wxw79czBv6V/crOrXqCCOzxAIsrcup2FZlwvXlzetm3otS7o/Tzfo/O5dE68NkA==
+  dependencies:
+    "@babel/runtime" "^7.25.0"
+    "@mui/utils" "^5.16.5"
+
+"@mui/x-tree-view@^7.12.0":
+  version "7.12.0"
+  resolved "https://registry.yarnpkg.com/@mui/x-tree-view/-/x-tree-view-7.12.0.tgz#d93fcfc57052baa5ed5d672651a65f2ff19c5f62"
+  integrity sha512-zuj0//1k7Ku8hmKpnzy5zCqZRK8ocDChhD3nCFwEc9jndb0PnDqHMBPSrsZgFnmBiFdLt6bMtTY96d37pxp5Yg==
+  dependencies:
+    "@babel/runtime" "^7.25.0"
+    "@mui/system" "^5.16.5"
+    "@mui/utils" "^5.16.5"
+    "@mui/x-internals" "7.12.0"
+    "@types/react-transition-group" "^4.4.10"
+    clsx "^2.1.1"
+    prop-types "^15.8.1"
+    react-transition-group "^4.4.5"
 
 "@openrouter/ai-sdk-provider@^0.0.4":
   version "0.0.4"
@@ -2794,6 +2816,11 @@ lru-cache@^5.1.1:
   integrity sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==
   dependencies:
     yallist "^3.0.2"
+
+lucide-react@^0.426.0:
+  version "0.426.0"
+  resolved "https://registry.yarnpkg.com/lucide-react/-/lucide-react-0.426.0.tgz#15ab8cbf73c45655bcc8d3a69065277d4e201808"
+  integrity sha512-aby5G+Zt+LIIEU0n9900XQNJFJUcs7/S+jOEgIhkV08NX3kGx1zxALKh1JvAKcYqutWLg07exbnYvh66szhrRA==
 
 lz-string@^1.5.0:
   version "1.5.0"

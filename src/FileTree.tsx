@@ -34,20 +34,20 @@ const FileTree: React.FC = () => {
   }, []);
 
   const renderTree = (nodes: FileNode[]): JSX.Element => (
-        <>
-      {nodes.map(node => {
+    <SimpleTreeView sx={{
+        textTransform: 'none',
+    }}>
+      {nodes.map((node, index) => {
         if (node.is_directory) {
-            return <TreeItem itemId={node.name}>
-                {node.children.length > 0 && renderTree(node.children)}
-            </TreeItem>
+          return <TreeItem key={index} itemId={node.path} label={node.name}>
+            {node.children.length > 0 && renderTree(node.children)}
+          </TreeItem>
         } else {
-            return <TreeItem itemId={node.name}>
-                {node.name}
-            </TreeItem>
+          return <TreeItem key={index} itemId={node.path} label={node.name} />
         }
       })
       }
-      </>
+    </SimpleTreeView>
   );
 
   if (error) {
@@ -58,7 +58,7 @@ const FileTree: React.FC = () => {
     <>
       {fileTree ? (
         <SimpleTreeView>
-            {renderTree(fileTree)}
+          {renderTree(fileTree)}
         </SimpleTreeView>
       ) : (
         <Box>
