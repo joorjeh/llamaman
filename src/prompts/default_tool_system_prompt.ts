@@ -19,10 +19,7 @@ Reminder:
 - Function calls MUST follow the specified format
 - Required parameters MUST be specified
 - ONLY call one function at a time
-- Put the entire function call reply on one line
-- Always add your sources when using search results to answer the user query
-- Do not explain tool use, only return functions to be executed
-- If an error message is returned do not call any more functions
+- If a function is not needed just reply normally
 
 <|eot_id|><|start_header_id|>user<|end_header_id|>
 `;
