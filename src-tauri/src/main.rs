@@ -131,9 +131,14 @@ fn update_user_config(state: State<ConfigState>, new_config: UserConfig) {
 // Default tools
 #[command]
 fn system_call(command: &str) -> Result<String, Error> {
+    let config = read_config();
+    let workspace_dir = PathBuf::from_str(&config.workspace_dir)
+        .map_err(|err| err.to_string()).unwrap();
+
     let output = Command::new("bash")
         .arg("-c")
         .arg(command)
+        .current_dir(workspace_dir)
         .output()?;
 
     if output.status.success() {
