@@ -87,6 +87,21 @@ const FileTree = ({
     });
 
     newSelectedItems = Array.from(new Set(newSelectedItems));
+
+    // Check for parents with deselected children
+    const hasDeselectedChildren = (item: TreeViewBaseItem): boolean => {
+      if (!item.children) return false;
+      return item.children.some(child => {
+        return !child || !newSelectedItems.includes(child.id) || hasDeselectedChildren(child);
+      });
+    };
+
+    const itemMap = new Map(items.map(item => [item.id, item]));
+    newSelectedItems = newSelectedItems.filter(id => {
+      const item = itemMap.get(id);
+      return item && !hasDeselectedChildren(item);
+    });
+
     const filesOnly = newSelectedItems.filter(id => fileMap.get(id));
     setSelectedFiles(filesOnly);
     setSelectedItems(newSelectedItems);
