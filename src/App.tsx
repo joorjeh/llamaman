@@ -42,6 +42,10 @@ function App() {
     setSnackbarOpen(true);
   }
 
+  useEffect(() => {
+    console.log(selectedFiles);
+  }, [selectedFiles]);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };

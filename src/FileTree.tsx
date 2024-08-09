@@ -12,7 +12,13 @@ interface FileNode {
   children?: FileNode[];
 }
 
-const FileTree: React.FC = () => {
+interface FileTreeProps {
+  setSelectedFiles: React.Dispatch<React.SetStateAction<string[]>>
+}
+
+const FileTree = ({
+  setSelectedFiles
+}: FileTreeProps) => {
   const [error, setError] = useState<string | null>(null);
   const [items, setItems] = useState<TreeViewBaseItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
@@ -75,7 +81,7 @@ const FileTree: React.FC = () => {
     });
 
     newSelectedItems = Array.from(new Set(newSelectedItems));
-    console.log(newSelectedItems);
+    setSelectedFiles(newSelectedItems);
     setSelectedItems(newSelectedItems);
   };
 
