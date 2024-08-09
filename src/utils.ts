@@ -45,3 +45,11 @@ export async function getAwsCredentials(): Promise<AwsCredentials> {
   return await invoke('get_aws_credentials');
 }
 
+export async function readFile(filename: string): Promise<string> {
+  return await invoke('read_file', { filename });
+}
+
+export async function collectFileContent(files: string[]): Promise<string> {
+  const contents = await Promise.all(files.map(file => readFile(file)));
+  return contents.join('\n');
+}

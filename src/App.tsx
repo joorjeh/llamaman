@@ -3,7 +3,7 @@ import { Box, CircularProgress, Modal, Snackbar } from '@mui/material';
 import { default_tool_system_prompt } from './prompts/default_tool_system_prompt';
 import Message from './types/Message';
 import Sender from './types/Sender';
-import { parseFunctionArgs, getUserConfig, findJsonObject } from './utils';
+import { parseFunctionArgs, getUserConfig, findJsonObject, collectFileContent } from './utils';
 import tools from './tools/tools';
 import Tool from './types/Tool';
 import Configuration from './Configuration';
@@ -26,6 +26,7 @@ function App() {
   const messagesEndRef = useRef<any>(null);
   const [client, setClient] = useState<StreamingClient | null>(null);
   const [maxSteps, setMaxSteps] = useState<number>(10);
+  const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
   const [messages, setMessages] = useState<Message[]>([{
     role: Sender.SYSTEM,
     content: default_tool_system_prompt,
@@ -34,17 +35,11 @@ function App() {
     role: Sender.SYSTEM,
     content: default_tool_system_prompt,
   }]);
-  // TODO maybe should be not state, not related to UI, but easier to pass between components
-  const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
 
   const setSnackBar = (message: string) => {
     setSnackbarMessage(message);
     setSnackbarOpen(true);
   }
-
-  useEffect(() => {
-    console.log(selectedFiles);
-  }, [selectedFiles]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -87,8 +82,19 @@ function App() {
   const handleSendMessage = async (message: Message) => {
     setQueryingModel(true);
     if (message) {
-      messagesRef.current = [...messagesRef.current, message];
-      setMessages(prevMessages => [...prevMessages, message]);
+      let newMessages = [message];
+      const fileContents = await collectFileContent(selectedFiles);
+      if (fileContents) {
+        newMessages = [
+          message,
+          {
+            role: Sender.SYSTEM,
+            content: `File contents added:\n${fileContents}`,
+          }
+        ]
+      }
+      messagesRef.current = [...messagesRef.current, ...newMessages];
+      setMessages(prevMessages => [...prevMessages, ...newMessages]);
 
       let funcDescription: FuncDescription | null = null;
       // TODO handle no connection errors

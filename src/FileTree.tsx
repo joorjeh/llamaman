@@ -31,6 +31,16 @@ const FileTree = ({
         const fileTree: FileNode[] = await invoke('get_file_tree', { pathString: config.workspace_dir });
 
         const newFileMap = new Map<string, boolean>();
+
+        const removeWorkspaceDir = (node: FileNode) => {
+          node.path = node.path.replace(new RegExp(`^${config.workspace_dir}/`), '');
+          if (node.children) {
+            node.children.forEach(removeWorkspaceDir);
+          }
+        };
+
+        fileTree.forEach(removeWorkspaceDir);
+
         const buildItems = (nodes: FileNode[]): TreeViewBaseItem[] => {
           return nodes.map(node => {
             newFileMap.set(node.path, !node.is_directory);
@@ -51,7 +61,6 @@ const FileTree = ({
 
     fetchFileTree();
   }, []);
-
   if (error) {
     return <div>{error}</div>;
   }

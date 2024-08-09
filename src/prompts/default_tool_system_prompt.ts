@@ -1,6 +1,6 @@
 import tools from '../tools/tools';
 
-export const default_tool_system_prompt: string = `
+export const default_tool_system_prompt = `
 Cutting Knowledge Date: December 2023
 Today Date: 23 Jul 2024
 
