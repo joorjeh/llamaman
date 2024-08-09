@@ -67,7 +67,6 @@ const FileTree = ({
   };
 
   const handleSelectedItemsChange = (event: React.SyntheticEvent, itemIds: string[]) => {
-    event.preventDefault();
     let newSelectedItems = [...itemIds];
     const deselectedItems = selectedItems.filter(id => !itemIds.includes(id));
 
