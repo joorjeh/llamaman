@@ -82,19 +82,13 @@ function App() {
   const handleSendMessage = async (message: Message) => {
     setQueryingModel(true);
     if (message) {
-      let newMessages = [message];
       const fileContents = await collectFileContent(selectedFiles);
       if (fileContents) {
-        newMessages = [
-          message,
-          {
-            role: Sender.SYSTEM,
-            content: `File contents added:\n${fileContents}`,
-          }
-        ]
+        message.content += `\nReference files:${fileContents}`;
       }
-      messagesRef.current = [...messagesRef.current, ...newMessages];
-      setMessages(prevMessages => [...prevMessages, ...newMessages]);
+
+      messagesRef.current = [...messagesRef.current, message];
+      setMessages(prevMessages => [...prevMessages, message]);
 
       let funcDescription: FuncDescription | null = null;
       // TODO handle no connection errors
@@ -127,24 +121,21 @@ function App() {
             const tool: Tool = tools[funcDescription.name]
             const parsedArgs: Record<string, string | number | boolean> = parseFunctionArgs(funcDescription.parameters, tool.args);
 
-            setMessages(prevMessages => [...prevMessages, {
-              content: `Calling function ${funcDescription!.name}(${Object.values(parsedArgs).join(', ')})`,
-              role: Sender.SYSTEM,
-            }]);
             const returnValue = await tool.f(parsedArgs);
 
             const systemMessage: Message = {
               content: `Function '${funcDescription.name}' was called and returned ${returnValue}.`,
-              role: Sender.SYSTEM,
+              role: Sender.USER,
             }
             steps.current += 1;
             await handleSendMessage(systemMessage);
           } else {
-            const systemMessage: Message = {
+            const newMessage: Message = {
               content: 'Max function steps reached, function calling cancelled.',
-              role: Sender.SYSTEM,
+              role: Sender.USER,
             }
-            setMessages(prevMessages => [...prevMessages, systemMessage]);
+            setMessages(prevMessages => [...prevMessages, newMessage]);
+            await handleSendMessage(newMessage);
             steps.current = 0;
           }
         } else {
@@ -155,18 +146,15 @@ function App() {
         setQueryingModel(false);
         steps.current = 0;
         if (error.name === 'AbortError') {
-          const systemMessage: Message = {
-            content: 'Message stream aborted',
-            role: Sender.SYSTEM,
-          }
-          setMessages(prevMessages => [...prevMessages, systemMessage]);
+          setSnackBar('Message stream aborted');
         } else if (error.name === 'TypeError') {
           if (error.toString() === "TypeError: undefined is not an object (evaluating 'tool.parameters')") {
-            const systemMessage: Message = {
+            const newMessage: Message = {
               content: `Function ${funcDescription!.name} not found`,
-              role: Sender.SYSTEM,
+              role: Sender.USER,
             };
-            setMessages(prevMessages => [...prevMessages, systemMessage]);
+            steps.current += 1;
+            await handleSendMessage(newMessage);
             console.error(`Function ${funcDescription!.name} not found`);
           }
         } else {

@@ -116,7 +116,7 @@ const Configuration = ({
           >
             <MenuItem value="aws">AWS</MenuItem>
             <MenuItem value="ollama">Ollama</MenuItem>
-            {/* <MenuItem value="openrouter">OpenRouter</MenuItem> */}
+            <MenuItem value="anthropic">Anthropic</MenuItem>
           </Select>
         </Box>
         <Box sx={{ gridArea: 'url' }}>URL</Box>

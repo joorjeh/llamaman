@@ -7,6 +7,6 @@ export default interface StreamingArgs {
   url?: string;
   temperature?: number;
   top_p?: number;
-  signal: any;
+  signal: AbortSignal;
   client?: BedrockRuntimeClient;
 }

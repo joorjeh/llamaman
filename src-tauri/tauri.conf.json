@@ -15,17 +15,16 @@
       "notification": {
         "all": true
       },
-      "shell": {
-        "all": true
-      },
-      "fs": {
-        "all": true
+      "http": {
+        "scope": [
+          "https://api.anthropic.com/v1/messages"
+        ]
       }
     },
     "windows": [
       {
         "title": "LlamaMan",
-        "width": 1000,
+        "width": 1100,
         "height": 900
       }
     ],

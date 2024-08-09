@@ -1,6 +1,7 @@
 import AwsClient from "./AwsClient";
 import StreamingClient from "./Client";
 import OllamaClient from "./OllamaClient";
+import AnthropicClient from "./AnthropicClient";
 
 export interface StreamingClientOptions {
   region?: string,
@@ -8,6 +9,7 @@ export interface StreamingClientOptions {
   temperature?: number,
   top_p?: number,
   url?: string,
+  apiKey?: string,
 }
 
 export const getStreamingClient = async ({
@@ -32,15 +34,12 @@ export const getStreamingClient = async ({
       top_p: options.top_p,
       model: options.model,
     });
+  } else if (platform === 'anthropic') {
+    return await AnthropicClient.create({
+      model: options.model,
+      temperature: options.temperature,
+      top_p: options.top_p,
+    });
   }
-  // else if (platform === 'openrouter') {
-  //     return OpenRouterClient.create({
-  //         temperature: options.temperature,
-  //         top_p: options.top_p,
-  //         model: options.model, 
-  //     });
-  // }
-  // This should never be reached, simply
-  // to satisfy TypeScript compiler
   return OllamaClient.create(options);
 }

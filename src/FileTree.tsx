@@ -23,11 +23,13 @@ const FileTree = ({
   const [items, setItems] = useState<TreeViewBaseItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [fileMap, setFileMap] = useState<Map<string, boolean>>(new Map());
+  const [workspaceDir, setWorkspaceDir] = useState<string>('');
 
   useEffect(() => {
     const fetchFileTree = async () => {
       try {
         const config = await getUserConfig();
+        setWorkspaceDir(config.workspace_dir);
         const fileTree: FileNode[] = await invoke('get_file_tree', { pathString: config.workspace_dir });
 
         const newFileMap = new Map<string, boolean>();
@@ -107,7 +109,12 @@ const FileTree = ({
   };
 
   return (
-    <>
+    <Box sx={{
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '10px',
+    }}>
+      <Box>{workspaceDir}</Box>
       {items.length > 0 ? (
         <RichTreeView
           items={items}
@@ -121,7 +128,7 @@ const FileTree = ({
           Loading...
         </Box>
       )}
-    </>
+    </Box>
   );
 };
 

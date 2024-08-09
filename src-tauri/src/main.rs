@@ -13,6 +13,9 @@ use std::io::Write;
 use std::io::Read;
 use std::path::PathBuf;
 use std::process::Command;
+use reqwest::Client;
+use tauri::Manager;
+use futures_util::StreamExt;
 
 // Idiomatic error for Tauri 
 #[derive(Debug, thiserror::Error)]
@@ -125,6 +128,26 @@ fn write_config(config: &UserConfig) {
     fs::write(config_path, config_str).expect("Failed to write config file");
 }
 
+#[tauri::command]
+async fn stream_data(window: tauri::Window) -> Result<(), String> {
+    let client = Client::new();
+    let url = "https://api.example.com/stream"; // Replace with your streaming API URL
+
+    let res = client.get(url).send().await.map_err(|e| e.to_string())?;
+
+    let mut stream = res.bytes_stream();
+
+    while let Some(item) = stream.next().await {
+        let chunk = item.map_err(|e| e.to_string())?;
+        let data = String::from_utf8_lossy(&chunk);
+        
+        // Send each chunk to the frontend
+        window.emit("stream-data", data.to_string()).map_err(|e| e.to_string())?;
+    }
+
+    Ok(())
+}
+
 #[command]
 fn get_user_config(state: State<ConfigState>) -> UserConfig {
     state.0.lock().unwrap().clone()
@@ -227,6 +250,7 @@ fn main() {
             get_file_tree,
             read_file,
             write_file,
+            stream_data,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

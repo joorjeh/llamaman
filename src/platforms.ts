@@ -8,9 +8,10 @@ export const modelIds: Record<string, string[]> = {
     "llama3",
     "llama3.1",
   ],
-  "openrouter": [
-    "meta-llama/llama-3.1-405b-instruct",
-    "meta-llama/llama-3.1-70b-instruct",
-    "meta-llama/llama-3.1-8b-instruct",
-  ]
+  "anthropic": [
+    "claude-3-5-sonnet-20240620",
+    "claude-3-opus-20240229",
+    "claude-3-sonnet-20240229",
+    "claude-3-haiku-20240307",
+  ],
 };
