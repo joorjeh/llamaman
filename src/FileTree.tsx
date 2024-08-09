@@ -1,5 +1,5 @@
 // FileTree.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { invoke } from '@tauri-apps/api/tauri';
 import { getUserConfig } from './utils';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
@@ -15,8 +15,8 @@ interface FileNode {
 
 const FileTree: React.FC = () => {
   const [fileTree, setFileTree] = useState<FileNode[]>([]);
-  const [workspaceDir, setWorkspaceDir] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+  const selectedFileRef = useRef<string[]>([]);
 
   useEffect(() => {
     const fetchFileTree = async () => {
@@ -24,7 +24,6 @@ const FileTree: React.FC = () => {
         const config = await getUserConfig();
         const fileTree: FileNode[] = await invoke('get_file_tree', { pathString: config.workspace_dir });
         setFileTree(fileTree);
-        setWorkspaceDir(config.workspace_dir);
       } catch (err) {
         setError('Failed to load file tree.');
       }
@@ -33,6 +32,16 @@ const FileTree: React.FC = () => {
     fetchFileTree();
   }, []);
 
+  const flattenTree = (nodes: FileNode[], result: FileNode[] = []): FileNode[] => {
+    nodes.forEach((node) => {
+      result.push(node);
+      if (node.children.length > 0) {
+        flattenTree(node.children, result);
+      }
+    });
+    return result;
+  }
+
   const renderTree = (nodes: FileNode[]): JSX.Element => {
     return (
       <SimpleTreeView
@@ -40,12 +49,13 @@ const FileTree: React.FC = () => {
           textTransform: 'none',
         }}
         multiSelect
+        checkboxSelection
         onItemSelectionToggle={handleItemSelectionToggle}
       >
         {nodes.map((node, index) => {
           if (node.is_directory) {
             return (
-              <TreeItem key={index} itemId={node.path} label={node.name}>
+              <TreeItem key={node.path} itemId={node.path} label={node.name}>
                 {node.children.length > 0 && renderTree(node.children)}
               </TreeItem>
             );
@@ -68,21 +78,31 @@ const FileTree: React.FC = () => {
     itemId: string,
     isSelected: boolean,
   ) => {
+    // TODO extremely inefficient, improve
     event.preventDefault();
-    console.log(itemId, isSelected);
+    const flattenedFileTree = flattenTree(fileTree);
+    flattenedFileTree.forEach((node) => {
+      if (node.path === itemId && !node.is_directory) {
+        if (isSelected) {
+          selectedFileRef.current.push(itemId);
+        } else {
+          selectedFileRef.current = selectedFileRef.current.filter((path) => path !== itemId);
+        }
+      }
+    });
+  }
+
+    return (
+      <>
+        {fileTree ? (
+          renderTree(fileTree)
+        ) : (
+          <Box>
+            Loading...
+          </Box>
+        )}
+      </>
+    );
   };
 
-  return (
-    <>
-      {fileTree ? (
-        renderTree(fileTree)
-      ) : (
-        <Box>
-          Loading...
-        </Box>
-      )}
-    </>
-  );
-};
-
-export default FileTree;
+  export default FileTree;
