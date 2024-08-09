@@ -22,6 +22,7 @@ const FileTree = ({
   const [error, setError] = useState<string | null>(null);
   const [items, setItems] = useState<TreeViewBaseItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [fileMap, setFileMap] = useState<Map<string, boolean>>(new Map());
 
   useEffect(() => {
     const fetchFileTree = async () => {
@@ -29,15 +30,20 @@ const FileTree = ({
         const config = await getUserConfig();
         const fileTree: FileNode[] = await invoke('get_file_tree', { pathString: config.workspace_dir });
 
+        const newFileMap = new Map<string, boolean>();
         const buildItems = (nodes: FileNode[]): TreeViewBaseItem[] => {
-          return nodes.map(node => ({
-            id: node.path,
-            label: node.name,
-            ...(node.children && node.children.length > 0 ? { children: buildItems(node.children) } : {})
-          }));
+          return nodes.map(node => {
+            newFileMap.set(node.path, !node.is_directory);
+            return {
+              id: node.path,
+              label: node.name,
+              ...(node.children && node.children.length > 0 ? { children: buildItems(node.children) } : {})
+            };
+          });
         };
 
         setItems(buildItems(fileTree));
+        setFileMap(newFileMap);
       } catch (err) {
         setError('Failed to load file tree.');
       }
@@ -81,7 +87,8 @@ const FileTree = ({
     });
 
     newSelectedItems = Array.from(new Set(newSelectedItems));
-    setSelectedFiles(newSelectedItems);
+    const filesOnly = newSelectedItems.filter(id => fileMap.get(id));
+    setSelectedFiles(filesOnly);
     setSelectedItems(newSelectedItems);
   };
 
