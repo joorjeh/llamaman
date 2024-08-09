@@ -61,7 +61,7 @@ const FileTree = ({
 
     fetchFileTree();
 
-    const intervalId = setInterval(fetchFileTree, 3000);
+    const intervalId = setInterval(fetchFileTree, 2000);
 
     return () => clearInterval(intervalId);
   }, []);
