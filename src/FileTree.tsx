@@ -57,12 +57,23 @@ const FileTree: React.FC = () => {
   const handleSelectedItemsChange = (event: React.SyntheticEvent, itemIds: string[]) => {
     event.preventDefault();
     let newSelectedItems = [...itemIds];
+    const deselectedItems = selectedItems.filter(id => !itemIds.includes(id));
+
     itemIds.forEach(id => {
       const item = items.find(item => item.id === id);
       if (item && item.children) {
         newSelectedItems = [...newSelectedItems, ...getAllChildrenIds(item)];
       }
     });
+
+    deselectedItems.forEach(id => {
+      const item = items.find(item => item.id === id);
+      if (item && item.children) {
+        const childrenIds = getAllChildrenIds(item);
+        newSelectedItems = newSelectedItems.filter(id => !childrenIds.includes(id));
+      }
+    });
+
     newSelectedItems = Array.from(new Set(newSelectedItems));
     console.log(newSelectedItems);
     setSelectedItems(newSelectedItems);
