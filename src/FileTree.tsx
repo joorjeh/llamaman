@@ -44,10 +44,28 @@ const FileTree: React.FC = () => {
     return <div>{error}</div>;
   }
 
+  const getAllChildrenIds = (item: TreeViewBaseItem): string[] => {
+    let ids: string[] = [item.id];
+    if (item.children) {
+      item.children.forEach(child => {
+        ids = [...ids, ...getAllChildrenIds(child)];
+      });
+    }
+    return ids;
+  };
+
   const handleSelectedItemsChange = (event: React.SyntheticEvent, itemIds: string[]) => {
     event.preventDefault();
-    console.log(itemIds);
-    setSelectedItems(itemIds);
+    let newSelectedItems = [...itemIds];
+    itemIds.forEach(id => {
+      const item = items.find(item => item.id === id);
+      if (item && item.children) {
+        newSelectedItems = [...newSelectedItems, ...getAllChildrenIds(item)];
+      }
+    });
+    newSelectedItems = Array.from(new Set(newSelectedItems));
+    console.log(newSelectedItems);
+    setSelectedItems(newSelectedItems);
   };
 
   return (
