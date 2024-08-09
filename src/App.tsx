@@ -34,11 +34,17 @@ function App() {
     role: Sender.SYSTEM,
     content: default_tool_system_prompt,
   }]);
+  // TODO maybe should be not state, not related to UI, but easier to pass between components
+  const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
 
   const setSnackBar = (message: string) => {
     setSnackbarMessage(message);
     setSnackbarOpen(true);
   }
+
+  useEffect(() => {
+    console.log(selectedFiles);
+  }, [selectedFiles]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -200,7 +206,7 @@ function App() {
             borderLeft: '1px solid black',
             padding: '10px',
           }}>
-            <FileTree />
+            <FileTree setSelectedFiles={setSelectedFiles} />
           </Box>
         </Box>
       }

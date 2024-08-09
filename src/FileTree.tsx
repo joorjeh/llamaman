@@ -1,4 +1,3 @@
-// FileTree.tsx
 import React, { useEffect, useRef, useState } from 'react';
 import { invoke } from '@tauri-apps/api/tauri';
 import { getUserConfig } from './utils';
@@ -13,10 +12,15 @@ interface FileNode {
   children: FileNode[];
 }
 
-const FileTree: React.FC = () => {
+interface FileTreeProps {
+  setSelectedFiles: React.Dispatch<React.SetStateAction<string[]>>;
+}
+
+const FileTree = ({
+  setSelectedFiles,
+}: FileTreeProps) => {
   const [fileTree, setFileTree] = useState<FileNode[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const selectedFileRef = useRef<string[]>([]);
 
   useEffect(() => {
     const fetchFileTree = async () => {
@@ -84,9 +88,9 @@ const FileTree: React.FC = () => {
     flattenedFileTree.forEach((node) => {
       if (node.path === itemId && !node.is_directory) {
         if (isSelected) {
-          selectedFileRef.current.push(itemId);
+          setSelectedFiles((prevSelectedFiles) => [...prevSelectedFiles, itemId]);
         } else {
-          selectedFileRef.current = selectedFileRef.current.filter((path) => path !== itemId);
+          setSelectedFiles((prevSelectedFiles) => prevSelectedFiles.filter((path) => path !== itemId));
         }
       }
     });
