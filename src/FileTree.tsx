@@ -46,6 +46,18 @@ const FileTree = ({
     return result;
   }
 
+  const getAllFilePaths = (node: FileNode): string[] => {
+    let paths: string[] = [];
+    if (!node.is_directory) {
+      paths.push(node.path);
+    } else {
+      node.children.forEach(child => {
+        paths = [...paths, ...getAllFilePaths(child)];
+      });
+    }
+    return paths;
+  }
+
   const renderTree = (nodes: FileNode[]): JSX.Element => {
     return (
       <SimpleTreeView
@@ -56,19 +68,11 @@ const FileTree = ({
         checkboxSelection
         onItemSelectionToggle={handleItemSelectionToggle}
       >
-        {nodes.map((node, index) => {
-          if (node.is_directory) {
-            return (
-              <TreeItem key={node.path} itemId={node.path} label={node.name}>
-                {node.children.length > 0 && renderTree(node.children)}
-              </TreeItem>
-            );
-          } else {
-            return (
-              <TreeItem key={index} itemId={node.path} label={node.name} />
-            );
-          }
-        })}
+        {nodes.map((node, index) => (
+          <TreeItem key={node.path} itemId={node.path} label={node.name}>
+            {node.children.length > 0 && renderTree(node.children)}
+          </TreeItem>
+        ))}
       </SimpleTreeView>
     );
   };
@@ -82,31 +86,33 @@ const FileTree = ({
     itemId: string,
     isSelected: boolean,
   ) => {
-    // TODO extremely inefficient, improve
     event.preventDefault();
     const flattenedFileTree = flattenTree(fileTree);
-    flattenedFileTree.forEach((node) => {
-      if (node.path === itemId && !node.is_directory) {
-        if (isSelected) {
-          setSelectedFiles((prevSelectedFiles) => [...prevSelectedFiles, itemId]);
-        } else {
-          setSelectedFiles((prevSelectedFiles) => prevSelectedFiles.filter((path) => path !== itemId));
-        }
+    const selectedNode = flattenedFileTree.find(node => node.path === itemId);
+
+    if (selectedNode) {
+      const filePaths = getAllFilePaths(selectedNode);
+
+      if (isSelected) {
+        setSelectedFiles(prevSelectedFiles => [...new Set([...prevSelectedFiles, ...filePaths])]);
+      } else {
+        setSelectedFiles(prevSelectedFiles => prevSelectedFiles.filter(path => !filePaths.includes(path)));
       }
-    });
+    }
   }
 
-    return (
-      <>
-        {fileTree ? (
-          renderTree(fileTree)
-        ) : (
-          <Box>
-            Loading...
-          </Box>
-        )}
-      </>
-    );
-  };
+  return (
+    <>
+      {fileTree ? (
+        renderTree(fileTree)
+      ) : (
+        <Box>
+          Loading...
+        </Box>
+      )}
+    </>
+  );
+};
 
-  export default FileTree;
+export default FileTree;
+
